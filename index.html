@@ -3,257 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEGO Zombie Xmas Runner 🎄🧟‍♂️</title>
+    <title>Xmas Zombie Apocalypse Quest 🎄🧟‍♂️</title>
     <style>
         body {
-            background-color: #0b0f19;
-            color: #ffffff;
+            background-color: #0f172a;
+            color: #f8fafc;
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 0;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 95vh;
         }
 
-        #gameContainer {
-            text-align: center;
+        .container {
+            width: 100%;
+            max-width: 650px;
             background: #1e293b;
-            padding: 20px;
-            border-radius: 12px;
             border: 3px solid #38bdf8;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
         }
 
-        canvas {
-            background: linear-gradient(to bottom, #1e293b, #0f172a);
-            border: 2px solid #475569;
-            border-radius: 8px;
-            display: block;
-            margin: 0 auto;
+        h1 { color: #f43f5e; margin-top: 0; font-size: 22px; }
+        .hud { font-size: 14px; color: #38bdf8; margin-bottom: 15px; font-weight: bold; }
+
+        .game-screen {
+            background: #090d16;
+            border: 2px dashed #475569;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
-        .instructions {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #38bdf8;
+        /* Stiluri Nivel 1 & 2 */
+        .btn {
+            background-color: #10b981;
+            color: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-family: 'Courier New', Courier, monospace;
         }
+        .btn:hover { background-color: #059669; color: white; }
+
+        .lego-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center; }
+        .lego-piece { padding: 12px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; border: 2px solid rgba(255,255,255,0.3); }
+        .bg-red { background: #dc2626; }
+        .bg-green { background: #16a34a; }
+        .bg-blue { background: #2563eb; }
+
+        /* Canvas pentru Nivel 2 */
+        canvas { background: #111827; border: 2px solid #374151; border-radius: 6px; display: block; margin: 0 auto; }
+
+        /* Stiluri Puzzle Nivel 3 */
+        .puzzle-grid { display: grid; grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(3, 80px); gap: 3px; background: #334155; padding: 3px; border-radius: 6px; }
+        .puzzle-tile { background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: white; cursor: pointer; user-select: none; }
+        .puzzle-tile.empty { background: #0f172a; cursor: default; }
+
+        .msg { margin-top: 12px; font-weight: bold; font-size: 14px; }
+        .error { color: #f43f5e; }
+        .success { color: #34d399; }
     </style>
 </head>
 <body>
 
-    <div id="gameContainer">
-        <h2 style="margin: 0 0 10px 0; color: #f43f5e;">🧟‍♂️ LEGO Zombie Xmas Runner 🧱🎄</h2>
-        <canvas id="gameCanvas" width="700" height="300"></canvas>
-        <div class="instructions">Apasă <b>SPACEBAR</b> sau <b>Click pe ecran</b> ca să sari peste zombii și obstacole!</div>
+    <div class="container">
+        <h1>🧟‍♂️ Xmas Zombie Quest 🎄🧱</h1>
+        <div class="hud" id="hudTitle">Nivelul 1: Construirea Zidului de Apărare</div>
+        <div class="game-screen" id="screen"></div>
     </div>
 
 <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    const screen = document.getElementById("screen");
+    const hud = document.getElementById("hudTitle");
+    let currentLevel = 1;
 
-    // Stările jocului
-    let gameStarted = false;
-    let gameOver = false;
-    let gameWon = false;
-    let score = 0;
-    const winningScore = 300; // Câștigă după ce adună dest urmă
+    // ==========================================
+    // NIVELUL 1: Construiește Zidul LEGO
+    // ==========================================
+    let legoStep = 0;
+    function loadLevel1() {
+        hud.innerText = "Nivelul 1: Construirea Zidului LEGO 🧱";
+        screen.innerHTML = `
+            <p>O hoardă de zombii se apropie! Pune cărămizile LEGO în ordinea corectă (Roșu ➔ Verde ➔ Albastru) ca să ridici zidul:</p>
+            <div class="lego-row">
+                <div class="lego-piece bg-blue" onclick="checkLego('blue')">Piesa Albastră</div>
+                <div class="lego-piece bg-red" onclick="checkLego('red')">Piesa Roșie</div>
+                <div class="lego-piece bg-green" onclick="checkLego('green')">Piesa Verde</div>
+            </div>
+            <div class="msg" id="msg1"></div>
+        `;
+    }
 
-    // Jucătorul (Figurina LEGO)
-    let player = {
-        x: 50,
-        y: 210,
-        width: 30,
-        height: 50,
-        dy: 0,
-        jumpPower: -11,
-        gravity: 0.6,
-        grounded: true,
-        color: "#f43f5e"
-    };
-
-    // Obstacolele (Zombii / Bariere de Crăciun)
-    let obstacles = [];
-    let obstacleTimer = 0;
-
-    // Ascultător pentru taste / click
-    document.addEventListener("keydown", function(e) {
-        if (e.code === "Space") {
-            e.preventDefault();
-            triggerJump();
-        }
-    });
-
-    canvas.addEventListener("click", function() {
-        triggerJump();
-    });
-
-    function triggerJump() {
-        if (!gameStarted) {
-            gameStarted = true;
-        } else if (player.grounded && !gameOver && !gameWon) {
-            player.dy = player.jumpPower;
-            player.grounded = false;
-        } else if (gameOver || gameWon) {
-            resetGame();
+    function checkLego(color) {
+        const msg = document.getElementById("msg1");
+        if (legoStep === 0 && color === 'red') {
+            legoStep++;
+            msg.innerHTML = `<span class="success">✔️ Piesa roșie fixată! Urmează verde.</span>`;
+        } else if (legoStep === 1 && color === 'green') {
+            legoStep++;
+            msg.innerHTML = `<span class="success">✔️ Piesa verde fixată! Mai rămâne albastra.</span>`;
+        } else if (legoStep === 2 && color === 'blue') {
+            msg.innerHTML = `<span class="success">🎉 Zid construit cu succes! Trecem la nivelul 2...</span>`;
+            setTimeout(() => { currentLevel = 2; loadLevel2(); }, 1200);
+        } else {
+            msg.innerHTML = `<span class="error">❌ Ordine greșită! Zidul s-a dărâmat. Încearcă din nou.</span>`;
+            legoStep = 0;
         }
     }
 
-    function resetGame() {
-        gameOver = false;
-        gameWon = false;
-        score = 0;
-        obstacles = [];
-        player.y = 210;
-        player.dy = 0;
-        player.grounded = true;
-        gameStarted = true;
-    }
+    // ==========================================
+    // NIVELUL 2: Ferește-te de Zombie (Mătură & Coasă)
+    // ==========================================
+    let animId;
+    function loadLevel2() {
+        hud.innerText = "Nivelul 2: Ferește-te de Zombieland (Kiseleff Style) 🏃‍♂️";
+        screen.innerHTML = `
+            <p style="margin:0 0 5px 0; font-size:12px;">Apasă <b>SPACEBAR</b> sau <b>Click</b> ca să sari peste zombiul cu mătura și coasa!</p>
+            <canvas id="c2" width="500" height="180"></canvas>
+            <div class="msg" id="msg2">Supraviețuiește 15 secunde!</div>
+        `;
 
-    // Generare obstacole
-    function spawnObstacle() {
-        obstacleTimer++;
-        if (obstacleTimer > 90) { // Frecvența obstacolelor
-            obstacles.push({
-                x: canvas.width,
-                y: 220,
-                width: 25,
-                height: 40,
-                color: "#10b981" // Zombii verzi
-            });
-            obstacleTimer = 0;
-        }
-    }
+        const canvas = document.getElementById("c2");
+        const ctx = canvas.getContext("2d");
 
-    // Bucla principală a jocului
-    function update() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let p = { x: 40, y: 120, w: 20, h: 35, dy: 0, jump: -9, g: 0.5, grounded: true };
+        let zomb = { x: 500, y: 115, w: 25, h: 40, speed: 3.5 };
+        let survivalTime = 0;
+        let timerInterval = setInterval(() => { survivalTime++; }, 1000);
 
-        // Desenare cer / fundal festiv
-        ctx.fillStyle = "#38bdf8";
-        ctx.font = "12px Courier New";
-        ctx.fillText("🌟 🎄 🎁 🎅 ❄️ 🧱 🧟‍♂️ 🎄 🌟", 150, 30);
-
-        if (!gameStarted) {
-            // Ecran Start
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "20px Courier New";
-            ctx.textAlign = "center";
-            ctx.fillText("APASĂ SPACE SAU CLICK PENTRU START", canvas.width / 2, canvas.height / 2);
-            ctx.textAlign = "left";
-            requestAnimationFrame(update);
-            return;
-        }
-
-        if (!gameOver && !gameWon) {
-            // Gravitație jucător
-            player.dy += player.gravity;
-            player.y += player.dy;
-
-            // Solul
-            if (player.y > 210) {
-                player.y = 210;
-                player.dy = 0;
-                player.grounded = true;
-            }
-
-            // Scor
-            score++;
-            if (score >= winningScore) {
-                gameWon = true;
-            }
-
-            // Gestionare obstacole
-            spawnObstacle();
-
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].x -= 5; // Viteza de deplasare
-
-                // Coliziune (Bynary box check)
-                if (
-                    player.x < obstacles[i].x + obstacles[i].width &&
-                    player.x + player.width > obstacles[i].x &&
-                    player.y < obstacles[i].y + obstacles[i].height &&
-                    player.y + player.height > obstacles[i].y
-                ) {
-                    gameOver = true;
-                }
-
-                // Ștergere obstacole ieșite din ecran
-                if (obstacles[i].x + obstacles[i].width < 0) {
-                    obstacles.splice(i, 1);
-                }
+        function jumpHandler(e) {
+            if (e.code === "Space" || e.type === "click") {
+                if (p.grounded) { p.dy = p.jump; p.grounded = false; }
             }
         }
+        document.addEventListener("keydown", jumpHandler);
+        canvas.addEventListener("click", jumpHandler);
 
-        // --- DESENARE ELEMENTE PE ECRAN ---
-
-        // Solul
-        ctx.fillStyle = "#334155";
-        ctx.fillRect(0, 260, canvas.width, 40);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 260, canvas.width, 4); // Zăpadă pe sol
-
-        // Jucătorul (Figurina LEGO stilizată)
-        ctx.fillStyle = player.color;
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-        // Cap LEGO
-        ctx.fillStyle = "#facc15";
-        ctx.fillRect(player.x + 5, player.y - 12, 20, 15);
-
-        // Obstacolele (Zombii)
-        for (let obs of obstacles) {
-            ctx.fillStyle = obs.color;
-            ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-            // Căciuliță mică de Crăciun pe zombi
-            ctx.fillStyle = "#ef4444";
-            ctx.fillRect(obs.x + 2, obs.y - 8, 15, 8);
-        }
-
-        // Afișare scor
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "16px Courier New";
-        ctx.fillText("Progres Bază: " + Math.floor((score / winningScore) * 100) + "%", 20, 30);
-
-        // Ecran de Game Over
-        if (gameOver) {
-            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#f43f5e";
-            ctx.font = "22px Courier New";
-            ctx.textAlign = "center";
-            ctx.fillText("💀 ZOMBII TE-AU PRINS! 💀", canvas.width / 2, canvas.height / 2 - 15);
-            ctx.font = "14px Courier New";
-            ctx.fillStyle = "#ffffff";
-            ctx.fillText("Apasă Click sau Space ca să reîncerci", canvas.width / 2, canvas.height / 2 + 20);
-            ctx.textAlign = "left";
-        }
-
-        // Ecran de Câștig (Victorie)
-        if (gameWon) {
-            ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#34d399";
-            ctx.font = "18px Courier New";
-            ctx.textAlign = "center";
-            ctx.fillText("🌟 BAZA LEGO A SUPRAVIEȚUIT! 🌟", canvas.width / 2, canvas.height / 2 - 50);
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "13px Courier New";
-            ctx.fillText("Cadoul tău (Raspberry Pi 5) este la iubita ta!", canvas.width / 2, canvas.height / 2 - 15);
-            ctx.fillText("1. Codul 'I love you': apasă de 3 ori 👆✨", canvas.width / 2, canvas.height / 2 + 15);
-            ctx.fillText("2. Primești un pupic cald de la ea! 😘", canvas.width / 2, canvas.height / 2 + 45);
-            ctx.textAlign = "left";
-        }
+            // Gravitație
+            p.dy += p.g; p.y += p.dy;
+            if (p.y > 120) { p.y = 120; p.dy = 0; p.grounded = true; }
 
-        requestAnimationFrame(update);
+            // Zombi (cu mătura și coasa sugerate vizual)
+            zomb.x -= zomb.speed;
+            if (zomb.x < -30) zomb.x = 520;
+
+            // Coliziune
+            if (p.x < zomb.x + zomb.w && p.x + p.w > zomb.x && p.y < zomb.y + zomb.h && p.y + p.h > zomb.y) {
+                cancelAnimationFrame(animId);
+                clearInterval(timerInterval);
+                document.removeEventListener("keydown", jumpHandler);
+                document.getElementById("msg2`.innerHTML = `<span class='error'>💀 Te-a prins zombiul! <button class='btn' onclick='loadLevel2()'>Reîncearcă</button></span>`;
+                return;
+            }
+
+            // Victorie Nivel 2
+            if (survivalTime >= 12) {
+                cancelAnimationFrame(animId);
+                clearInterval(timerInterval);
+                document.removeEventListener("keydown", jumpHandler);
+                screen.innerHTML = `<h3 style="color:#34d399;">🎉 Nivelul 2 trecut! Ai scăpat de zombiul cu mătura și coasa!</h3><button class='btn' onclick='currentLevel=3; loadLevel3();'>Treci la Puzzle</button>`;
+                return;
+            }
+
+            // Desenează solul
+            ctx.fillStyle = "#334155"; ctx.fillRect(0, 155, canvas.width, 25);
+            // Jucător
+            ctx.fillStyle = "#38bdf8"; ctx.fillRect(p.x, p.y, p.w, p.h);
+            // Zombi (cu armele în mâini: mătura & coasa)
+            ctx.fillStyle = "#10b981"; ctx.fillRect(zomb.x, zomb.y, zomb.w, zomb.h);
+            ctx.fillStyle = "#facc15"; ctx.fillRect(zomb.x - 8, zomb.y + 10, 8, 4); // Mătura/Coasa
+
+            ctx.fillStyle = "#ffffff"; ctx.font = "11px Courier New";
+            ctx.fillText("Timp supraviețuire: " + survivalTime + "/12s", 15, 20);
+
+            animId = requestAnimationFrame(loop);
+        }
+        loop();
     }
 
-    // Pornire animație
-    update();
+    // ==========================================
+    // NIVELUL 3: Puzzle Foto cu Voi Doi
+    // ==========================================
+    function loadLevel3() {
+        hud.innerText = "Nivelul 3: Reconstruiește Amintirea (Puzzle Foto) 🧩";
+        screen.innerHTML = `
+            <p style="font-size:13px; margin:5px 0;">Aranjează piesele în ordine (1 la 8) pentru a debloca imaginea finală:</p>
+            <div class="puzzle-grid" id="puzzleBoard"></div>
+            <div class="msg" id="msg3"></div>
+            <button class="btn" style="margin-top:10px;" onclick="solvePuzzleManually()">Rezolvă rapid (Test)</button>
+        `;
+        initPuzzle();
+    }
+
+    let tiles = [1, 2, 3, 4, 5, 6, 7, "", 8]; // Stare amestecată simplificată sau secvențială
+    function initPuzzle() {
+        // Amestecăm simplu pentru test run sigur
+        tiles = [1, 3, 2, 4, 6, 5, 7, 8, ""];
+        renderPuzzle();
+    }
+
+    function renderPuzzle() {
+        const board = document.getElementById("puzzleBoard");
+        board.innerHTML = "";
+        tiles.forEach((val, idx) => {
+            const tile = document.createElement("div");
+            tile.className = `puzzle-tile ${val === "" ? "empty" : ""}`;
+            tile.innerText = val;
+            tile.onclick = () => moveTile(idx);
+            board.appendChild(tile);
+        });
+    }
+
+    function moveTile(idx) {
+        // Logică simplă de mutare cu spațiul gol
+        let emptyIdx = tiles.indexOf("");
+        // Verificăm dacă sunt vecini
+        let validMoves = [emptyIdx - 1, emptyIdx + 1, emptyIdx - 3, emptyIdx + 3];
+        if (validMoves.includes(idx)) {
+            tiles[emptyIdx] = tiles[idx];
+            tiles[idx] = "";
+            renderPuzzle();
+            checkPuzzleWin();
+        }
+    }
+
+    function checkPuzzleWin() {
+        const winningState = [1, 2, 3, 4, 5, 6, 7, 8, ""];
+        if (tiles.every((val, i) => val === winningState[i])) {
+            document.getElementById("msg3").innerHTML = `<span class="success">🎉 Puzzle completat! Amintirea a fost refăcută!</span>`;
+            setTimeout(() => { loadVictoryScreen(); }, 1500);
+        }
+    }
+
+    function solvePuzzleManually() {
+        tiles = [1, 2, 3, 4, 5, 6, 7, 8, ""];
+        renderPuzzle();
+        document.getElementById("msg3").innerHTML = `<span class="success">🎉 Puzzle completat!</span>`;
+        setTimeout(() => { loadVictoryScreen(); }, 1200);
+    }
+
+    // ==========================================
+    // FINALUL: Victorie & Cadou
+    // ==========================================
+    function loadVictoryScreen() {
+        hud.innerText = "MISIUNE ÎNDEPLINITĂ 🏆";
+        screen.innerHTML = `
+            <h2 style="color: #34d399; margin-top:0;">🌟 AI SUPRAVIEȚUIT APOCALIPSEI ZOMBIE! 🌟</h2>
+            <p style="font-size: 14px; line-height: 1.6; text-align: left; background: #0f172a; padding: 15px; border-radius: 8px;">
+                Baza ta a rezistat atacului, zombii cu mături și coase au fost Răpuși, iar amintirile au fost restaurate!<br><br>
+                🎁 <b>PREMIUL TĂU FIZIC:</b><br>
+                Cadoul tău secret te așteaptă la iubita ta (fără să știi exact ce e în cutie!).<br><br>
+                <b>Protocolul obligatoriu de ridicare:</b><br>
+                1. Du-te la ea și dă-i un pupic cald 😘<br>
+                2. Execută codul vostru secret de „I love you”: <b>apasă de 3 ori în orice loc</b> 👆✨
+            </p>
+        `;
+    }
+
+    // Pornire joc la prima încărcare
+    loadLevel1();
 </script>
 
 </body>
