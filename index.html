@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xmas Terminal Protocol - Secure Release</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #39d353;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        #terminal {
+            flex-grow: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding-bottom: 10px;
+        }
+        .input-line {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #30363d;
+            padding-top: 10px;
+        }
+        .prompt {
+            color: #ff7b72;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        input {
+            background: transparent;
+            border: none;
+            color: #c9d1d9;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            flex-grow: 1;
+            outline: none;
+        }
+        .system-msg { color: #58a6ff; }
+        .error-msg { color: #ff7b72; }
+        .success-msg { color: #39d353; font-weight: bold; }
+        .ascii { color: #f0883e; }
+    </style>
+</head>
+<body>
+
+    <div id="terminal"></div>
+    
+    <div class="input-line">
+        <span class="prompt">guest@xmas-core:~$</span>
+        <input type="text" id="commandInput" autofocus autocomplete="off" spellcheck="false">
+    </div>
+
+<script>
+    const terminal = document.getElementById('terminal');
+    const input = document.getElementById('commandInput');
+
+    let currentLevel = 1;
+
+    function print(text, className = '') {
+        const div = document.createElement('div');
+        if (className) div.className = className;
+        div.innerHTML = text;
+        terminal.appendChild(div);
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    print(`<span class="ascii">
+  _  __          _                    ____             _         
+ | |/ /___ _   _| |   ___  ___ _ __  |  _ \\ _ __ ___  (_)_ __    
+ | ' // _ \\ | | | |   / _ \\/ __| '__| | |_) | '__/ _ \\ | | '_ \\   
+ | . \\  __/ |_| | |__|  __/ (__| |    |  __/| | |  __/_| | | | |  
+ |_|\\_\\___|\\__,_|_____\\___|\\___|_|    |_|   |_|  \\___(_)_|_| |_|  
+    </span>`, 'ascii');
+    print("🎄 [SYSTEM ALERT] Conexiune securizată stabilită cu Serverul Secret de Crăciun.");
+    print("ℹ️ Bun venit, programatorule! Ca să deblochezi pachetul cadou (<b>Raspberry_Pi_5.img</b>), trebuie să treci de protocolul de securitate.");
+    print("💡 Tastază <b>help</b> pentru a vedea comenzile disponibile.\n");
+
+    const fileSystem = {
+        "readme.txt": "Misiune: Găsește parola secretă a bazei de date. Indiciu nivel 1: Întreabă-o pe iubita ta cum alintă cel mai des sistemul.",
+        "secret_log.git": "commit 404a8b2: [Xmas Update] Fixed bug where boyfriend was too genius. Added hidden gift under the couch.",
+        "config.json": '{\n  "target": "Raspberry Pi 5",\n  "status": "LOCKED",\n  "encryption": "SHA-256-LOVE"\n}'
+    };
+
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const cmd = input.value.trim();
+            print(`<span class="prompt">guest@xmas-core:~$</span> ${cmd}`);
+            handleCommand(cmd);
+            input.value = '';
+        }
+    });
+
+    function handleCommand(cmd) {
+        const parts = cmd.split(' ');
+        const mainCmd = parts[0].toLowerCase();
+        const arg = parts[1];
+
+        switch(mainCmd) {
+            case 'help':
+                print("📋 Comenzi disponibile:");
+                print("  <b>ls</b>            - Listează fișierele din directorul curent");
+                print("  <b>cat [fișier]</b>  - Citește conținutul unui fișier");
+                print("  <b>git status</b>    - Verifică starea repository-ului de Crăciun");
+                print("  <b>git log</b>     - Vezi istoricul commit-urilor (s-ar putea să găsești Easter Eggs)");
+                print("  <b>decrypt [cod]</b> - Încearcă să spargi parola nivelului curent");
+                print("  <b>hint</b>          - Afișează un indiciu prietenos");
+                print("  <b>clear</b>         - Curăță ecranul terminalului");
+                break;
+
+            case 'ls':
+                print("📂 Fișiere disponibile în director:");
+                for (let file in fileSystem) {
+                    print(`  - ${file}`);
+                }
+                break;
+
+            case 'cat':
+                if (!arg) {
+                    print("Eroare: Specifică un fișier (ex: cat readme.txt)", "error-msg");
+                } else if (fileSystem[arg]) {
+                    print(fileSystem[arg].replace(/\n/g, '<br>'), "system-msg");
+                } else {
+                    print(`Eroare: Fișierul '${arg}'-nu există sau a fost șters de un Elf obraznic.`, "error-msg");
+                }
+                break;
+
+            case 'git':
+                if (arg === 'status') {
+                    print("On branch main\nYour branch is up to date with 'origin/xmas-2026'.\nChanges not staged for commit:\n  (use 'git add <file>' to update what will be committed)\n	<span class='error-msg'>modified:   heart_status (overloaded with love)</span>");
+                } else if (arg === 'log') {
+                    print("commit 9f8e7d6 (HEAD -> main)\nAuthor: Iubita ta <december@xmas.local>\nDate:   Fri Dec 24 2026\n\n    feat: added the best tech gift ever for the smartest developer.");
+                } else {
+                    print("Comandă git necunoscută. Încearcă 'git status' sau 'git log'.");
+                }
+                break;
+
+            case 'hint':
+                if (currentLevel === 1) {
+                    print("💡 Indiciu Nivel 1: Deschide fișierul secret_log.git sau gândește-te la o parolă legată de voi doi (aniversarea voastră sau o poreclă). Sau tastează direct 'decrypt iubire'.");
+                } else if (currentLevel === 2) {
+                    print("💡 Indiciu Nivel 2: Caută prin codul sursă al paginii sau rulează comanda care îți cere un cod de deblocare.");
+                }
+                break;
+
+            case 'decrypt':
+                if (currentLevel === 1) {
+                    if (arg && (arg.toLowerCase() === 'iubire' || arg.toLowerCase() === 'craciun' || arg.toLowerCase() === 'raspberry')) {
+                        currentLevel = 2;
+                        print("🎉 Nivelul 1 trecut! Firewall-ul de Crăciun a cedat parțial.", "success-msg");
+                        print("🔐 Nivelul 2: S-a deschis protocolul root. Pentru a extrage <b>Raspberry_Pi_5.img</b>, introdu comanda finală: <b>sudo unwrap-gift</b>");
+                    } else {
+                        print("❌ Parolă incorectă! Elfii spun că nu e asta. Mai încearcă sau scrie 'hint'.", "error-msg");
+                    }
+                } else {
+                    print("Eroare: Nivelul 1 a fost deja depășit. Folosește comanda specifică nivelului 2.", "error-msg");
+                }
+                break;
+
+            case 'sudo':
+                if (arg === 'unwrap-gift' && currentLevel >= 2) {
+                    triggerFinalVictory();
+                } else {
+                    print("❌ Acces respres. Utilizatorul nu are permisiuni de Moș Crăciun.", "error-msg");
+                }
+                break;
+
+            case 'clear':
+                terminal.innerHTML = '';
+                break;
+
+            default:
+                print(`Comandă necunoscută: '${mainCmd}'. Tastează 'help' pentru ajutor.`, "error-msg");
+        }
+    }
+
+    function triggerFinalVictory() {
+        terminal.innerHTML = '';
+        print(`<span class="ascii">
+   _____                _      _               _    ____  _   _ ___ 
+  |_   _|__  _ __ _ __ | |__  (_)_ __   __ _  | |  |  _ \\| | | |_ _|
+    | |/ _ \\| '__| '_ \\| '_ \\ | | '_ \\ / _\` | | |  | |_) | | | || | 
+    | | (_) | |  | |_) | | | || | | | | (_| | | |__|  __/| |_| || | 
+    |_|\\___/|_|  | .__/|_| |_||_|_| |_|\\__, | |_____|_|    \\___/|___|
+                 |_|                   |___/                         
+        </span>`, 'success-msg');
+        
+        print("🎁 <b>DECRYPTION SUCCESSFUL! PACHETUL A FOST INSTALAT CU SUCCES!</b> 🎁", "success-msg");
+        print("------------------------------------------------------------------");
+        print("❤️ Felicitări, programatorul meu favorit! Ai spart sistemul de Crăciun.");
+        print("⚡ Premiul tău pentru cel mai clever iubit este: <b>Un nou Raspberry Pi 5</b> gata de experimente!");
+        print("🏠 <b>Indiciu fizic:</b> Mergi la [scrie aici unde ai ascuns cadoul prin casă] ca să-ți ridici hardware-ul real! 🚀");
+        print("------------------------------------------------------------------\n");
+        input.style.display = 'none';
+        document.querySelector('.prompt').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
