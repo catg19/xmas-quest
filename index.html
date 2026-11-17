@@ -61,7 +61,7 @@
         }
         .btn:hover { background-color: #059669; color: white; }
 
-        /* Nivel 1: Pattern Perete LEGO */
+        /* Nivel 1: Paletă piese LEGO pentru Drag & Drop */
         .lego-palette {
             display: flex;
             gap: 12px;
@@ -72,12 +72,11 @@
             width: 65px;
             height: 32px;
             border-radius: 4px;
-            cursor: pointer;
+            cursor: grab;
             box-shadow: inset 0 2px 3px rgba(255,255,255,0.4), 0 3px 5px rgba(0,0,0,0.4);
             border-bottom: 3px solid rgba(0,0,0,0.4);
-            transition: transform 0.1s;
         }
-        .lego-source-brick:hover { transform: scale(1.08); }
+        .lego-source-brick:active { cursor: grabbing; }
 
         .lego-pattern-grid {
             display: grid;
@@ -100,10 +99,12 @@
             justify-content: center;
             font-size: 11px;
             color: #64748b;
-            cursor: pointer;
             transition: background 0.2s;
         }
-        .lego-slot:hover { background: #1e293b; }
+        .lego-slot.drag-over {
+            background: #334155;
+            border-color: #38bdf8;
+        }
 
         .bg-red { background-color: #dc2626; }
         .bg-yellow { background-color: #eab308; }
@@ -135,35 +136,32 @@
     let currentLevel = 1;
 
     // ==========================================
-    // NIVELUL 1: Pattern Perete LEGO (9 piese prin selectare & plasare)
+    // NIVELUL 1: Drag & Drop pe Pattern de Perete LEGO (9 piese)
     // ==========================================
-    let selectedColor = 'red';
     let placedCount = 0;
-
     function loadLevel1() {
         placedCount = 0;
-        selectedColor = 'red';
-        hud.innerText = "Nivelul 1: Asamblarea Peretelui LEGO 🧱";
+        hud.innerText = "Nivelul 1: Drag & Drop - Perete LEGO 🧱";
         screen.innerHTML = `
-            <p style="font-size:12px; margin:0 0 10px 0;">1. Alege culoarea piesei din paletă. <br>2. Dă click pe sloturile peretelui ca să montezi toate cele <b>9 piese</b>:</p>
+            <p style="font-size:12px; margin:0 0 10px 0;">Trage piesele din paletă și plasează-le în cele <b>9 sloturi</b> ale peretelui:</p>
             
             <div class="lego-palette">
-                <div class="lego-source-brick bg-red" onclick="selectColor('red')" id="sel-red" style="border: 3px solid #fff;" title="Roșu"></div>
-                <div class="lego-source-brick bg-yellow" onclick="selectColor('yellow')" id="sel-yellow" title="Galben"></div>
-                <div class="lego-source-brick bg-blue" onclick="selectColor('blue')" id="sel-blue" title="Albastru"></div>
-                <div class="lego-source-brick bg-green" onclick="selectColor('green')" id="sel-green" title="Verde"></div>
+                <div class="lego-source-brick bg-red" draggable="true" ondragstart="drag(event, 'red')"></div>
+                <div class="lego-source-brick bg-yellow" draggable="true" ondragstart="drag(event, 'yellow')"></div>
+                <div class="lego-source-brick bg-blue" draggable="true" ondragstart="drag(event, 'blue')"></div>
+                <div class="lego-source-brick bg-green" draggable="true" ondragstart="drag(event, 'green')"></div>
             </div>
 
             <div class="lego-pattern-grid" id="patternGrid">
-                <div class="lego-slot" onclick="fillSlot(this)">1</div>
-                <div class="lego-slot" onclick="fillSlot(this)">2</div>
-                <div class="lego-slot" onclick="fillSlot(this)">3</div>
-                <div class="lego-slot" onclick="fillSlot(this)">4</div>
-                <div class="lego-slot" onclick="fillSlot(this)">5</div>
-                <div class="lego-slot" onclick="fillSlot(this)">6</div>
-                <div class="lego-slot" onclick="fillSlot(this)">7</div>
-                <div class="lego-slot" onclick="fillSlot(this)">8</div>
-                <div class="lego-slot" onclick="fillSlot(this)">9</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">1</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">2</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">3</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">4</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">5</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">6</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">7</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">8</div>
+                <div class="lego-slot" ondragover="allowDrop(event)" ondragleave="removeHL(event)" ondrop="dropToSlot(event)">9</div>
             </div>
 
             <div class="msg" id="msg1">Piese montate în perete: 0 / 9</div>
@@ -171,41 +169,53 @@
         `;
     }
 
-    function selectColor(color) {
-        selectedColor = color;
-        ['red', 'yellow', 'blue', 'green'].forEach(c => {
-            document.getElementById('sel-' + c).style.border = "none";
-        });
-        document.getElementById('sel-' + color).style.border = "3px solid #fff";
+    function allowDrop(ev) {
+        ev.preventDefault();
+        ev.target.classList.add("drag-over");
     }
 
-    function fillSlot(slot) {
-        if (slot.getAttribute("data-filled") === "true") return;
+    function removeHL(ev) {
+        ev.target.classList.remove("drag-over");
+    }
 
-        slot.setAttribute("data-filled", "true");
-        slot.style.backgroundColor = selectedColor === 'red' ? '#dc2626' : (selectedColor === 'yellow' ? '#eab308' : (selectedColor === 'blue' ? '#2563eb' : '#16a34a'));
-        slot.style.borderStyle = "solid";
-        slot.style.borderColor = "rgba(255,255,255,0.4)";
-        slot.innerText = "";
-        placedCount++;
+    function drag(ev, color) {
+        ev.dataTransfer.setData("text", color);
+    }
 
-        const msg = document.getElementById("msg1");
-        if (placedCount === 9) {
-            msg.innerHTML = `<span class="success">🎉 Peretele LEGO este complet montat! Hoarda e oprită!</span>`;
-            document.getElementById("nextBtn1").style.display = "inline-block";
-        } else {
-            msg.innerHTML = `<span class="success">✔️ Piesă fixată! Rămase: ${9 - placedCount}</span>`;
+    function dropToSlot(ev) {
+        ev.preventDefault();
+        let slot = ev.target;
+        slot.classList.remove("drag-over");
+
+        if (slot.classList.contains("lego-slot") && !slot.hasAttribute("data-filled")) {
+            const color = ev.dataTransfer.getData("text");
+            if (!color) return;
+
+            slot.setAttribute("data-filled", "true");
+            slot.style.backgroundColor = color === 'red' ? '#dc2626' : (color === 'yellow' ? '#eab308' : (color === 'blue' ? '#2563eb' : '#16a34a'));
+            slot.style.borderStyle = "solid";
+            slot.style.borderColor = "rgba(255,255,255,0.4)";
+            slot.innerText = "";
+            placedCount++;
+
+            const msg = document.getElementById("msg1");
+            if (placedCount === 9) {
+                msg.innerHTML = `<span class="success">🎉 Peretele LEGO este complet montat prin Drag & Drop! Hoarda e oprită!</span>`;
+                document.getElementById("nextBtn1").style.display = "inline-block";
+            } else {
+                msg.innerHTML = `<span class="success">✔️ Piesă fixată în perete! Rămase: ${9 - placedCount}</span>`;
+            }
         }
     }
 
     // ==========================================
-    // NIVELUL 2: Ferește-te de zombii (8 zombii lenți, mătura & coasa, animat)
+    // NIVELUL 2: Ferește-te de zombii (Salt lung, 8 zombii lenți, mătura & coasa)
     // ==========================================
     let animId;
     function loadLevel2() {
         hud.innerText = "Nivelul 2: Evită Hoarda Kiseleff (Mătură & Coasă) 🏃‍♂️";
         screen.innerHTML = `
-            <p style="margin:0 0 5px 0; font-size:12px;">Apasă <b>SPACEBAR</b> sau <b>Click</b> pe ecran ca să sari peste cei 8 zombii lenți. Vezi mătura și coasa!</p>
+            <p style="margin:0 0 5px 0; font-size:12px;">Apasă <b>SPACEBAR</b> sau <b>Click</b> ca să faci un salt lung peste cei 8 zombii lenți!</p>
             <canvas id="c2" width="540" height="180"></canvas>
             <div class="msg" id="msg2">Supraviețuiește trecerii hoartei!</div>
         `;
@@ -213,16 +223,17 @@
         const canvas = document.getElementById("c2");
         const ctx = canvas.getContext("2d");
 
-        let p = { x: 50, y: 115, w: 22, h: 40, dy: 0, jump: -9.5, g: 0.5, grounded: true, legAnim: 0 };
+        // Salt mult mai lung și mai înalt
+        let p = { x: 50, y: 115, w: 22, h: 40, dy: 0, jump: -12.5, g: 0.45, grounded: true, legAnim: 0 };
         
         let zombies = [];
         for(let i=0; i<8; i++) {
             zombies.push({
-                x: 600 + i * 220,
+                x: 620 + i * 240, // Distanțați mai larg
                 y: 110,
                 w: 26,
                 h: 45,
-                speed: 2.2,
+                speed: 2.0, // Foarte lenți
                 hasWeapon: i % 2 === 0 ? "matura" : "coasa"
             });
         }
@@ -281,7 +292,7 @@
             if (zombies[zombies.length - 1].x < -50) {
                 cancelAnimationFrame(animId);
                 document.removeEventListener("keydown", jumpHandler);
-                screen.innerHTML = `<h3 style="color:#34d399; margin:10px 0;">🎉 Nivelul 2 trecut! Ai evitat toți cei 8 zombii cu mătura și coasa!</h3><button class='btn' onclick='currentLevel=3; loadLevel3();'>Treci la Puzzle Foto</button>`;
+                screen.innerHTML = `<h3 style="color:#34d399; margin:10px 0;">🎉 Nivelul 2 trecut! Ai evitat toți zombii cu mătura și coasa!</h3><button class='btn' onclick='currentLevel=3; loadLevel3();'>Treci la Puzzle Foto</button>`;
                 return;
             }
 
