@@ -82,7 +82,7 @@
         .lego-brick-item:active { cursor: grabbing; }
         .stud { width: 8px; height: 5px; background: rgba(255,255,255,0.4); border-radius: 2px 2px 0 0; }
 
-        /* Perete LEGO cu întrepătundere la jumătate (Stunning Brick Wall Pattern) */
+        /* Perete LEGO cu întrepătundere la jumătate */
         .brick-wall-container {
             display: flex;
             flex-direction: column;
@@ -99,7 +99,6 @@
             display: flex;
             gap: 4px;
         }
-        /* Rândul 2 și 4 sunt decalate la jumătate pentru efectul clasic de zid de cărămizi */
         .wall-row.offset {
             margin-left: 20px;
         }
@@ -146,7 +145,7 @@
     let currentLevel = 1;
 
     // ==========================================
-    // NIVELUL 1: Drag & Drop - Perete LEGO cu model decalat
+    // NIVELUL 1: Drag & Drop - Perete LEGO Suprapus
     // ==========================================
     let placedCount = 0;
     function loadLevel1() {
@@ -281,7 +280,7 @@
                 let z = zombies[i];
                 z.x -= z.speed;
 
-                if (p.x < z.x + z.w && p.x + p.w > z.x && p.y < z.y + z.h && p.y + p.h > z.y) {
+                if (p.x < z.x + z.w && p.x + p.w > z.x && p.y < z.y + z.h && p.y + z.h > z.y) {
                     cancelAnimationFrame(animId);
                     document.removeEventListener("keydown", jumpHandler);
                     document.getElementById("msg2").innerHTML = `<span class='error'>💀 Te-a prins zombiul! <button class='btn' onclick='loadLevel2()'>Reîncearcă</button></span>`;
@@ -301,118 +300,3 @@
                     ctx.fillStyle = "#e2e8f0"; ctx.fillRect(z.x + z.w + 12, z.y + 2, 10, 10);
                 }
             }
-
-            if (zombies[zombies.length - 1].x < -50) {
-                cancelAnimationFrame(animId);
-                document.removeEventListener("keydown", jumpHandler);
-                screen.innerHTML = `<h3 style="color:#34d399; margin:10px 0;">🎉 Nivelul 2 trecut! Ai evitat toți zombii cu mătura și coasa!</h3><button class='btn' onclick='currentLevel=3; loadLevel3();'>Treci la Puzzle Foto</button>`;
-                return;
-            }
-
-            animId = requestAnimationFrame(loop);
-        }
-        loop();
-    }
-
-    // ==========================================
-    // NIVELUL 3: Puzzle Foto cu poza ta atașată
-    // ==========================================
-    function loadLevel3() {
-        hud.innerText = "Nivelul 3: Reconstruiește Amintirea (Puzzle Foto) 🧩";
-        screen.innerHTML = `
-            <p style="font-size:12px; margin:0 0 10px 0;">Aranjează piesele imagini voastre prin click până se completează:</p>
-            <div id="photoPuzzle" style="display:grid; grid-template-columns:repeat(3, 85px); grid-template-rows:repeat(3, 85px); gap:2px; background:#334155; padding:2px; border-radius:6px; margin: 0 auto;"></div>
-            <div class="msg" id="msg3"></div>
-            <button class="btn" style="margin-top:10px;" onclick="solvePhotoPuzzle()">Rezolvă rapid (Test)</button>
-        `;
-        initPhotoPuzzle();
-    }
-
-    let pTiles = [1, 3, 2, 4, 6, 5, 7, 8, ""];
-    // Folosim link-ul imaginii tale atașate în conversație
-    const couplePhotoUrl = "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=300&auto=format&fit=crop"; 
-    // Poți folosi un placeholder sau direct un canvas tăiat din poza ta atașată
-
-    function initPhotoPuzzle() {
-        renderPhotoPuzzle();
-    }
-
-    function renderPhotoPuzzle() {
-        const board = document.getElementById("photoPuzzle");
-        board.innerHTML = "";
-        pTiles.forEach((val, idx) => {
-            const tile = document.createElement("div");
-            tile.style.width = "85px";
-            tile.style.height = "85px";
-            tile.style.cursor = val === "" ? "default" : "pointer";
-            tile.style.background = val === "" ? "#0f172a" : "#2563eb";
-            tile.style.display = "flex";
-            tile.style.alignItems = "center";
-            tile.style.justifyContent = "center";
-            tile.style.color = "#fff";
-            tile.style.fontWeight = "bold";
-            tile.style.fontSize = "18px";
-            tile.style.backgroundImage = val === "" ? "none" : `url('${couplePhotoUrl}')`;
-            
-            // Calculăm decupajul pentru puzzle bazat pe poză
-            if(val !== "") {
-                let row = Math.floor((val - 1) / 3);
-                let col = (val - 1) % 3;
-                tile.style.backgroundPosition = `-${col * 85}px -${row * 85}px`;
-                tile.style.backgroundSize = "255px 255px";
-            }
-            
-            tile.onclick = () => movePhotoTile(idx);
-            board.appendChild(tile);
-        });
-    }
-
-    function movePhotoTile(idx) {
-        let emptyIdx = pTiles.indexOf("");
-        let validMoves = [emptyIdx - 1, emptyIdx + 1, emptyIdx - 3, emptyIdx + 3];
-        if (validMoves.includes(idx)) {
-            pTiles[emptyIdx] = pTiles[idx];
-            pTiles[idx] = "";
-            renderPhotoPuzzle();
-            checkPhotoPuzzleWin();
-        }
-    }
-
-    function checkPhotoPuzzleWin() {
-        const winningState = [1, 2, 3, 4, 5, 6, 7, 8, ""];
-        if (pTiles.every((val, i) => val === winningState[i])) {
-            document.getElementById("msg3").innerHTML = `<span class="success">🎉 Puzzle completat! Amintirea voastră a fost refăcută!</span>`;
-            setTimeout(() => { loadVictoryScreen(); }, 1500);
-        }
-    }
-
-    function solvePhotoPuzzle() {
-        pTiles = [1, 2, 3, 4, 5, 6, 7, 8, ""];
-        renderPhotoPuzzle();
-        document.getElementById("msg3").innerHTML = `<span class="success">🎉 Puzzle completat!</span>`;
-        setTimeout(() => { loadVictoryScreen(); }, 1200);
-    }
-
-    // ==========================================
-    // FINALUL: Victorie & Cadou
-    // ==========================================
-    function loadVictoryScreen() {
-        hud.innerText = "MISIUNE ÎNDEPLINITĂ 🏆";
-        screen.innerHTML = `
-            <h2 style="color: #34d399; margin-top:0;">🌟 AI SUPRAVIEȚUIT APOCALIPSEI ZOMBIE! 🌟</h2>
-            <p style="font-size: 13px; line-height: 1.5; text-align: left; background: #0f172a; padding: 12px; border-radius: 8px; margin:0;">
-                Baza ta a rezistat atacului, cei 8 zombii cu mături și coase au fost depășiți, iar amintirile voastre au fost restaurate!<br><br>
-                🎁 <b>PREMIUL TĂU FIZIC:</b><br>
-                Cadoul tău secret te așteaptă la iubita ta (fără să știi exact ce e în cutie!).<br><br>
-                <b>Protocolul obligatoriu de ridicare:</b><br>
-                1. Du-te la ea și dă-i un pupic cald 😘<br>
-                2. Execută codul vostru secret de „I love you”: <b>apasă de 3 ori în orice loc</b> 👆✨
-            </p>
-        `;
-    }
-
-    loadLevel1();
-</script>
-
-</body>
-</html>
