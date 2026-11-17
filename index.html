@@ -266,4 +266,35 @@
             if(!p.grounded) p.legAnim += 0.2;
 
             ctx.fillStyle = "#334155"; ctx.fillRect(0, 155, canvas.width, 25);
-            ctx.fillStyle = "#ffffff"; ctx.fillRect(
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 155, canvas.width, 3);
+
+            // Caracter animat
+            ctx.fillStyle = "#38bdf8"; ctx.fillRect(p.x, p.y, p.w, p.h);
+            ctx.fillStyle = "#facc15"; ctx.fillRect(p.x + 3, p.y - 10, 16, 12);
+            ctx.fillStyle = "#1e293b";
+            let legOffset = Math.sin(p.legAnim) * 5;
+            ctx.fillRect(p.x + 3, p.y + p.h, 5, 10 + (p.grounded ? legOffset : 0));
+            ctx.fillRect(p.x + 14, p.y + p.h, 5, 10 - (p.grounded ? legOffset : 0));
+
+            for (let i = 0; i < zombies.length; i++) {
+                let z = zombies[i];
+                z.x -= z.speed;
+
+                if (p.x < z.x + z.w && p.x + p.w > z.x && p.y < z.y + z.h && p.y + z.h > z.y) {
+                    cancelAnimationFrame(animId);
+                    document.removeEventListener("keydown", jumpHandler);
+                    document.getElementById("msg2").innerHTML = `<span class='error'>💀 Te-a prins zombiul! <button class='btn' onclick='loadLevel2()'>Reîncearcă</button></span>`;
+                    return;
+                }
+
+                ctx.fillStyle = "#10b981"; ctx.fillRect(z.x, z.y, z.w, z.h);
+                ctx.fillStyle = "#047857"; ctx.fillRect(z.x + 4, z.y - 9, 18, 12);
+                
+                // Mătura sau Coasa în mână
+                ctx.fillStyle = "#94a3b8";
+                if (z.hasWeapon === "matura") {
+                    ctx.fillRect(z.x + z.w, z.y + 15, 18, 3);
+                    ctx.fillStyle = "#b45309"; ctx.fillRect(z.x + z.w + 12, z.y + 10, 8, 12);
+                } else {
+                    ctx.fillRect(z.x + z.w, z.y + 10, 15, 3);
+                    ctx.fillStyle = "#e2e8f0"; ctx.fillRect(
