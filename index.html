@@ -101,7 +101,7 @@
 
     <div class="header-banner">
         <h1>🎅 🎄 Secure Xmas Protocol 🦌 ✨</h1>
-        <p>Sistem de deblocare cadou secret</p>
+        <p>Sistem de deblocare cadou secret–Ediția de iarnă</p>
     </div>
 
     <div id="terminal"></div>
@@ -187,4 +187,56 @@
 
             case 'hint':
                 if (currentLevel === 1) {
-                    print("💡 <b>Indiciu Nivel 1
+                    print("💡 <b>Indiciu Nivel 1:</b> Este una dintre variantele din discuția voastră de pe Kiseleff (el zicea de coasă, tu de mătură). Încearcă să scrii 'decrypt coasa' sau 'decrypt matura'.");
+                } else if (currentLevel === 2) {
+                    print("💡 <b>Indiciu Nivel 2:</b> Cum alintă ea cel mai des sistemul? Un animal mic, pufos, are 8 litere și începe cu 'z'.");
+                }
+                break;
+
+            case 'decrypt':
+                if (currentLevel === 1) {
+                    if (arg && (arg.toLowerCase() === 'coasa' || arg.toLowerCase() === 'matura')) {
+                        currentLevel = 2;
+                        print("🎉 <b>Nivelul 1 trecut!</b> Ai nimerit amintirea de pe Kiseleff.", "success-msg");
+                        print("🔐 <b>Nivelul 2:</b> Acum introdu a doua parolă secretă (cum o alintei tu sistemul), folosind tot comanda: <b>decrypt [parola]</b>");
+                    } else {
+                        print("❌ Parolă incorectă pentru Nivelul 1! Mai gândește-te la plimbarea de pe Kiseleff (coasă vs. mătură) sau scrie 'hint'.", "error-msg");
+                    }
+                } else if (currentLevel === 2) {
+                    if (arg && arg.toLowerCase() === 'zmeurica') {
+                        triggerFinalVictory();
+                    } else {
+                        print("❌ Parolă incorectă pentru Nivelul 2! Nu este numele corect de alint. Mai încearcă sau scrie 'hint'.", "error-msg");
+                    }
+                }
+                break;
+
+            case 'clear':
+                terminal.innerHTML = '';
+                break;
+
+            default:
+                print(`❌ Comandă necunoscută: '${mainCmd}'. Tastează 'help' pentru ghid.`, "error-msg");
+        }
+    }
+
+    function triggerFinalVictory() {
+        terminal.innerHTML = '';
+        print(`<span class="ascii" style="color: #c8372d; font-weight: bold;">
+   🎁 ✨ DECRYPTION COMPLETE! ✨ 🎁
+        </span>`, 'success-msg');
+        
+        print("------------------------------------------------------------------");
+        print("❤️ <b>Felicitări, programatorul meu favorit! Ai spart toate codurile!</b>");
+        print("⚡ Toate fișierele au fost descărcate cu succes în inima mea.");
+        print("<br>🎁 <b>PREMIUL TĂU FIZIC:</b><br>Cadoul este chiar la mine! Ca să poți să-l ridici și să vezi ce e în cutie, trebuie să urmezi protocolul obligatoriu de predare:");
+        print("1. Primești un pupic cald de la iubita ta 😘");
+        print("2. Trebuie să o strângi în brațe de 3 ori (squeeze me 3 times) 🤗");
+        print("------------------------------------------------------------------\n");
+        input.style.display = 'none';
+        document.querySelector('.prompt').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
