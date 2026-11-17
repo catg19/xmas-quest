@@ -6,8 +6,8 @@
     <title>Xmas Secret Protocol 🎄</title>
     <style>
         body {
-            background-color: #fcfbf7; /* Crem cald / alb curat */
-            color: #1f3a29; /* Verde închis elegant */
+            background-color: #fcfbf7;
+            color: #1f3a29;
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
             padding: 20px;
@@ -18,7 +18,6 @@
             overflow: hidden;
         }
 
-        /* Fulgi de zăpadă decorativi pe fundal */
         .snowflakes {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -33,7 +32,7 @@
         .header-banner {
             z-index: 1;
             text-align: center;
-            border-bottom: 2px dashed #c8372d; /* Roșu Crăciun */
+            border-bottom: 2px dashed #c8372d;
             padding-bottom: 12px;
             margin-bottom: 15px;
         }
@@ -141,9 +140,8 @@
     print("ℹ️ Tastază <b>help</b> pentru a vedea comenzile pe care le poți folosi.\n");
 
     const fileSystem = {
-        "readme.txt": "Misiune Nivel 1: Găsește parola secretă. Indiciu: Întreabă-o pe iubita ta cum alintă cel mai des sistemul sau gândește-te la seara aia pe Kiseleff când ne-am contrazis: domnul de pe stradă avea în mână o mătură lungă (cum ziceai tu) sau o coasă (cum ziceam eu)? (Poți scrie și 'hint').",
-        "secret_log.git": "commit 8f2a1c: [Xmas Memory] Kiseleff walk - debate still open between broom vs scythe. The correct security keyword is how she nicknamed the system.",
-        "config.json": '{\n  "status": "SECURED",\n  "encryption": "TRUE-LOVE-2026"\n}'
+        "readme.txt": "Misiune Nivel 1: Găsește prima parolă. Gândește-te la seara aia pe Kiseleff când ne-am contrazis: domnul de pe stradă avea în mână o mătură lungă (cum ziceai tu) sau o coasă (cum ziceam eu)? Folosește comanda: decrypt [cuvantul_ales]. (Poți scrie și 'hint').",
+        "secret_log.git": "commit 8f2a1c: [Xmas Memory] Kiseleff walk - debate still open between broom vs scythe."
     };
 
     input.addEventListener('keydown', function(event) {
@@ -165,7 +163,6 @@
                 print("📋 <b>Comenzi disponibile:</b>");
                 print("  <b>ls</b>            - Listează fișierele secrete din director");
                 print("  <b>cat [fișier]</b>  - Citește conținutul unui fișier (ex: cat readme.txt)");
-                print("  <b>git status</b>    - Verifică starea repository-ului de Crăciun");
                 print("  <b>decrypt [cod]</b> - Încearcă să spargi parola cu un cuvânt cheie");
                 print("  <b>hint</b>          - Afișează un indiciu suplimentar");
                 print("  <b>clear</b>         - Curăță ecranul terminalului");
@@ -188,37 +185,29 @@
                 }
                 break;
 
-            case 'git':
-                if (arg === 'status') {
-                    print("On branch main\nYour branch is up to date with 'origin/xmas'.\nChanges not staged for commit:\n  <span class='error-msg'>modified:   heart_rate (spiked because of you)</span>");
-                } else {
-                    print("Comandă git necunoscută. Încearcă 'git status'.");
-                }
-                break;
-
             case 'hint':
-                print("💡 <b>Indiciu:</b> Gândește-te la cum alintă ea sistemul / cum i se spune drăgălaș unui animal mic și pufos. Cuvântul are 8 litere și începe cu litera 'z'.");
+                if (currentLevel === 1) {
+                    print("💡 <b>Indiciu Nivel 1:</b> Este una dintre variantele din discuția voastră de pe Kiseleff (fie ce ziceai tu, fie ce zicea el). Încearcă să scrii 'decrypt matura' sau 'decrypt coasa'.");
+                } else if (currentLevel === 2) {
+                    print("💡 <b>Indiciu Nivel 2:</b> Cum alintă ea cel mai des sistemul? Un animal mic, pufos, are 8 litere și începe cu 'z'.");
+                }
                 break;
 
             case 'decrypt':
                 if (currentLevel === 1) {
-                    if (arg && arg.toLowerCase() === 'zmeurica') {
+                    if (arg && (arg.toLowerCase() === 'matura' || arg.toLowerCase() === 'coasa')) {
                         currentLevel = 2;
-                        print("🎉 <b>Parolă corectă!</b> Sistemul a validat cu succes cheia 'zmeurica'.", "success-msg");
-                        print("🔐 <b>Ultimul pas:</b> Pentru a descărca pachetul final și a trimite semnalul către cadoul tău, introdu comanda: <b>sudo claim-gift</b>");
+                        print("🎉 <b>Nivelul 1 trecut!</b> Ai nimerit amintirea de pe Kiseleff.", "success-msg");
+                        print("🔐 <b>Nivelul 2:</b> Acum introdu a doua parolă secretă (cum o alintei tu sistemul), folosind tot comanda: <b>decrypt [parola]</b>");
                     } else {
-                        print("❌ Parolă incorectă! Nu este cuvântul căutat. Mai încearcă sau tastează 'hint'.", "error-msg");
+                        print("❌ Parolă incorectă pentru Nivelul 1! Mai gândește-te la plimbarea de pe Kiseleff (mătură sau coase) sau scrie 'hint'.", "error-msg");
                     }
-                } else {
-                    print("Eroare: Ai trecut deja de această etapă. Folosește comanda cerută pentru pasul final.", "error-msg");
-                }
-                break;
-
-            case 'sudo':
-                if (arg === 'claim-gift' && currentLevel >= 2) {
-                    triggerFinalVictory();
-                } else {
-                    print("❌ Acces respins. Comandă invalidă pentru nivelul actual.", "error-msg");
+                } else if (currentLevel === 2) {
+                    if (arg && arg.toLowerCase() === 'zmeurica') {
+                        triggerFinalVictory();
+                    } else {
+                        print("❌ Parolă incorectă pentru Nivelul 2! Nu este numele corect de alint. Mai încearcă sau scrie 'hint'.", "error-msg");
+                    }
                 }
                 break;
 
