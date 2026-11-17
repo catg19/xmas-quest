@@ -13,248 +13,218 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            height: 90vh;
-            position: relative;
-            overflow: hidden;
+            align-items: center;
+            min-height: 90vh;
         }
 
-        .snowflakes {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.3;
-            background-image: radial-gradient(#d4af37 1.5px, transparent 1.5px), radial-gradient(#c8372d 1px, transparent 1px);
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: #ffffff;
+            border: 3px solid #2d5a3f;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            padding: 25px;
+            box-sizing: border-box;
+            margin-top: 10px;
         }
 
-        .header-banner {
-            z-index: 1;
+        h1 {
+            color: #c8372d;
             text-align: center;
-            border-bottom: 2px dashed #c8372d;
-            padding-bottom: 12px;
+            font-size: 24px;
+            margin-top: 0;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: #2d5a3f;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #e0dfd5;
+            padding-bottom: 10px;
+        }
+
+        .game-screen {
+            background: #f4f3ea;
+            border: 2px solid #d0cfc3;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 180px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .action-box {
+            display: flex;
+            gap: 10px;
             margin-bottom: 15px;
         }
 
-        .header-banner h1 {
-            margin: 0;
-            font-size: 22px;
-            color: #c8372d;
-        }
-
-        .header-banner p {
-            margin: 5px 0 0 0;
-            font-size: 14px;
-            color: #2d5a3f;
-        }
-
-        #terminal {
+        input[type="text"] {
             flex-grow: 1;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            padding: 10px;
-            z-index: 1;
-            background: #ffffff;
-            border: 2px solid #e0dfd5;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        .input-line {
-            display: flex;
-            align-items: center;
-            margin-top: 15px;
-            padding: 10px;
-            background: #ffffff;
-            border: 2px solid #2d5a3f;
-            border-radius: 8px;
-            z-index: 1;
-        }
-
-        .prompt {
-            color: #c8372d;
-            margin-right: 8px;
-            font-weight: bold;
-        }
-
-        input {
-            background: transparent;
-            border: none;
-            color: #1f3a29;
+            padding: 12px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 16px;
-            flex-grow: 1;
+            border: 2px solid #2d5a3f;
+            border-radius: 6px;
             outline: none;
+            background: #fff;
+            color: #1f3a29;
         }
 
-        .system-msg { color: #2d5a3f; margin: 6px 0; }
-        .error-msg { color: #c8372d; font-weight: bold; margin: 6px 0; }
-        .success-msg { color: #2d5a3f; font-weight: bold; margin: 6px 0; }
-        .ascii { color: #d4af37; font-size: 12px; line-height: 1.1; }
+        button {
+            background-color: #c8372d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #a02b22;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .btn-choice {
+            background-color: #2d5a3f;
+        }
+        .btn-choice:hover {
+            background-color: #1f3a29;
+        }
+
+        .error { color: #c8372d; font-weight: bold; margin-top: 10px; }
+        .success { color: #2d5a3f; font-weight: bold; margin-top: 10px; }
+        
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="snowflakes"></div>
+    <div class="container">
+        <h1>🧟‍♂️ 🧱 LEGO Zombie Xmas Defense 🎅</h1>
+        <div class="subtitle">Sistem de supraviețuire tactică & misiune secretă de iarnă</div>
 
-    <div class="header-banner">
-        <h1>🧟‍♂️ 🧱 LEGO Zombie Xmas Defense 🎅 🎄</h1>
-        <p>Sistem de supraviețuire tactivă & apărare bază de Crăciun</p>
-    </div>
+        <div class="game-screen" id="gameScreen">
+            <!-- Dinamic prin JS -->
+        </div>
 
-    <div id="terminal"></div>
-    
-    <div class="input-line">
-        <span class="prompt">survivor@lego-base:~$</span>
-        <input type="text" id="commandInput" autofocus autocomplete="off" spellcheck="false">
+        <div id="inputSection" class="action-box">
+            <input type="text" id="userInput" placeholder="Introdu comanda sau răspunsul..." autofocus autocomplete="off">
+            <button id="submitBtn" onclick="handleAction()">Trimite</button>
+        </div>
+        
+        <div id="choiceSection" class="hidden btn-group">
+            <!-- Butoane opționale pentru alegeri -->
+        </div>
     </div>
 
 <script>
-    const terminal = document.getElementById('terminal');
-    const input = document.getElementById('commandInput');
+    const screen = document.getElementById("gameScreen");
+    const input = document.getElementById("userInput");
+    const inputSection = document.getElementById("inputSection");
+    const choiceSection = document.getElementById("choiceSection");
 
-    let currentLevel = 1;
+    let level = 1;
 
-    function print(text, className = '') {
-        const div = document.createElement('div');
-        if (className) div.className = className;
-        div.innerHTML = text;
-        terminal.appendChild(div);
-        terminal.scrollTop = terminal.scrollHeight;
+    function renderScreen() {
+        if (level === 1) {
+            screen.innerHTML = `
+                <b>Nivel 1: Apărarea Perimetrului (Zombii & LEGO)</b><br><br>
+                🎄 O hoardă de zombii se apropie amenințător de baza ta de Crăciun! Baza este construită din piese LEGO, dar perimetrul este descoperit.<br><br>
+                💡 <b>Misiune:</b> Trebuie să asamblezi rapid un zid de apărare din cărămizi LEGO.<br>
+                👉 <i>Indiciu: Scrie comanda</i> <code>build lego-wall</code> <i>ca să ridici zidul!</i>
+            `;
+        } else if (level === 2) {
+            screen.innerHTML = `
+                <b>Nivel 2: Amintirea de pe Kiseleff</b><br><br>
+                🧱 Zidul LEGO a oprit hoarda principală, dar un zombi masiv încearcă să spargă poarta principală!<br><br>
+                🕵️‍♂️ Sistemul de securitate îți cere o parolă bazată pe o amintire: În seara aia de pe Kiseleff când v-ați contrazis... ce zicea el că are domnul de pe stradă în mână?<br><br>
+                👇 Alege varianta corectă sau tastează răspunsul:
+            `;
+            inputSection.style.display = "none";
+            choiceSection.style.display = "flex";
+            choiceSection.innerHTML = `
+                <button class="btn-choice" onclick="checkChoice('coasa')">Coasa (El)</button>
+                <button class="btn-choice" onclick="checkChoice('matura')">Mătură lungă (Tu)</button>
+            `;
+        } else if (level === 3) {
+            choiceSection.style.display = "none";
+            inputSection.style.display = "flex";
+            screen.innerHTML = `
+                <b>Nivel 3: Codul Suprem de Suprascriere</b><br><br>
+                🎉 Ai trecut de poartă! Ești la ultimul pas.<br><br>
+                ⚡ Unitatea centrală a bazei necesită codul secret al proiectului (denumirea secretă pe care ai pus-o cadoului hardware care te așteaptă).<br><br>
+                💡 <i>Indiciu: Cum se numește proiectul secret? (Începe cu litera 'z'...)</i>
+            `;
+            input.value = "";
+            input.placeholder = "Introdu codul secret...";
+        } else if (level === 4) {
+            inputSection.style.display = "none";
+            choiceSection.style.display = "none";
+            screen.innerHTML = `
+                <div style="text-align: center; color: #c8372d;">
+                    <h2>🎁 🌟 BAZA LEGO SALVATĂ CU SUCCES! 🌟 🎁</h2>
+                </div>
+                ❤️ <b>Felicitări, supraviețuitorule! Ai spart toate codurile și ai trecut de apocalipsă!</b><br><br>
+                ⚡ Toate sistemele sunt securizate. Premiul tău hardware (Raspberry Pi 5) este ținut sub strictă pază de iubita ta!<br><br>
+                <b>Protocolul final de revendicare a cadoului:</b><br>
+                1. Du-te la ea și activează codul vostru secret de „I love you”: <b>apasă de 3 ori în orice loc</b> 👆✨<br>
+                2. Primești un pupic cald de la ea ca recompensă finală! 😘
+            `;
+        }
     }
 
-    print(`<span class="ascii">
-    [XMAS SURVIVAL SYSTEM v5.0]
-       ___    ____  __________ ____
-      /   \\  / __ \\/ ____/ __ \\_  \\
-     / /| \\/ / / / /_  / / / // /
-    / ___  / /_/ / __/ / /_/ // /_
-   /_/   |_\\____/_/   \\___\\/____/
-    </span>`);
-    
-    print("🧟‍♂️ <b>ALERTĂ APOCALIPSĂ:</b> O hoardă de zombii se apropie de baza ta LEGO de Crăciun!");
-    print("🧱 <b>Misiune:</b> Folosește comenzile terminalului ca să construiești apărarea din cărămizi LEGO și să securizezi baza.");
-    print("💡 Tastază <b>help</b> pentru a vedea comenzile tactice disponibile.\n");
+    function handleAction() {
+        const val = input.value.trim().toLowerCase();
+        
+        if (level === 1) {
+            if (val === "build lego-wall") {
+                level = 2;
+                renderScreen();
+            } else {
+                screen.innerHTML += `<div class="error">❌ Comandă greșită! Încearcă: <code>build lego-wall</code></div>`;
+            }
+        } else if (level === 3) {
+            if (val === "zmeurica") {
+                level = 4;
+                renderScreen();
+            } else {
+                screen.innerHTML += `<div class="error">❌ Cod incorect! Gândește-te la numele de cod al proiectului.</div>`;
+            }
+        }
+        input.value = "";
+    }
 
-    const fileSystem = {
-        "mission_brief.txt": "Nivel 1 - Apărare perimetru: Hoarda se apropie! Trebuie să ridici rapid un zid din cărămizi LEGO folosind comanda: build lego-wall",
-        "intel_kiseleff.txt": "Nivel 2 - Amintiri clasificate: Înainte să înceapă apocalipsa, vă amintiți de plimbarea de pe Kiseleff? Contradicția legată de ce avea domnul în mână: coasa (el) sau o mătură lungă (tu)? Folosește: decrypt [varianta]",
-        "zombie_log.log": "Status: Hordă la 100 de metri. Unitatea centrală necesită parola de alint a sistemului (un animal pufos cu 'z') pentru suprascriere."
-    };
+    function checkChoice(choice) {
+        if (choice === "coasa") {
+            level = 3;
+            renderScreen();
+        } else {
+            screen.innerHTML += `<div class="error"><br>❌ Nu, aia era varianta ta (mătura)! El a zis coasa. Mai încearcă!</div>`;
+        }
+    }
 
-    input.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            const cmd = input.value.trim();
-            print(`<span class="prompt">survivor@lego-base:~$</span> ${cmd}`);
-            handleCommand(cmd);
-            input.value = '';
+    input.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            handleAction();
         }
     });
 
-    function handleCommand(cmd) {
-        const parts = cmd.split(' ');
-        const mainCmd = parts[0].toLowerCase();
-        const arg = parts[1];
-
-        switch(mainCmd) {
-            case 'help':
-                print("📋 <b>Comenzi tactice disponibile:</b>");
-                print("  <b>ls</b>            - Listează fișierele de misiune din sector");
-                print("  <b>cat [fișier]</b>  - Citește fișierele (ex: cat mission_brief.txt)");
-                print("  <b>build [obiect]</b>- Construiește structuri LEGO (ex: build lego-wall)");
-                print("  <b>decrypt [cod]</b> - Sparge firewall-ul folosind parole secrete");
-                print("  <b>hint</b>          - Solicită suport tactic / indiciu");
-                print("  <b>clear</b>         - Curăță ecranul terminalului");
-                break;
-
-            case 'ls':
-                print("📂 <b>Fișiere de misiune detectate în sector:</b>");
-                for (let file in fileSystem) {
-                    print(`  - ${file}`);
-                }
-                break;
-
-            case 'cat':
-                if (!arg) {
-                    print("❌ Eroare: Specifică un fișier (ex: cat mission_brief.txt)", "error-msg");
-                } else if (fileSystem[arg]) {
-                    print(fileSystem[arg].replace(/\n/g, '<br>'), "system-msg");
-                } else {
-                    print(`❌ Eroare: Fișierul '${arg}' nu există în radarul bazei.`, "error-msg");
-                }
-                break;
-
-            case 'hint':
-                if (currentLevel === 1) {
-                    print("💡 <b>Indiciu Nivel 1:</b> Citește fișierul de misiune (cat mission_brief.txt) și tastează comanda 'build lego-wall'.");
-                } else if (currentLevel === 2) {
-                    print("💡 <b>Indiciu Nivel 2:</b> Răspunde la amintirea de pe Kiseleff (ce zicea el sau ce ziceai tu). Folosește 'decrypt coasa' sau 'decrypt matura'.");
-                } else if (currentLevel === 3) {
-                    print("💡 <b>Indiciu Nivel 3:</b> Care este numele de alint al sistemului? Un animal mic, pufos, cu 8 litere care începe cu 'z'. Folosește 'decrypt [nume]'.");
-                }
-                break;
-
-            case 'build':
-                if (currentLevel === 1) {
-                    if (arg && arg.toLowerCase() === 'lego-wall') {
-                        currentLevel = 2;
-                        print("🧱 <b>Succes!</b> Zidul de cărămizi LEGO a fost construit cu succes! Zombii s-au oprit la prima barieră.", "success-msg");
-                        print("🔐 <b>Nivelul 2 de criză:</b> Un zombi masiv încearcă să spargă poarta bazei. Citește fișierul <b>intel_kiseleff.txt</b> (folosește 'cat intel_kiseleff.txt') și deblochează cu 'decrypt coasa' sau 'decrypt matura'.");
-                    } else {
-                        print("❌ Construcție eșuată! Comandă greșită. Încearcă 'build lego-wall'.", "error-msg");
-                    }
-                } else {
-                    print("Eroare: Zidul LEGO este deja construit. Treci la următoarea etapă de securitate!", "error-msg");
-                }
-                break;
-
-            case 'decrypt':
-                if (currentLevel === 1) {
-                    print("❌ Mai întâi trebuie să construiești zidul de apărare LEGO! Tastează 'build lego-wall'.", "error-msg");
-                } else if (currentLevel === 2) {
-                    if (arg && (arg.toLowerCase() === 'coasa' || arg.toLowerCase() === 'matura')) {
-                        currentLevel = 3;
-                        print("🎉 <b>Nivelul 2 trecut!</b> Poarta bazei a rezistat atacului!", "success-msg");
-                        print("⚡ <b>Nivelul 3 (Final):</b> Sistemul central cere codul suprem de suprascriere (alintul animalului pufos). Introdu comanda: <b>decrypt [parola]</b>");
-                    } else {
-                        print("❌ Parolă incorectă pentru poarta bazei! Gândește-te la disputa de pe Kiseleff (coasă vs. mătură) sau scrie 'hint'.", "error-msg");
-                    }
-                } else if (currentLevel === 3) {
-                    if (arg && arg.toLowerCase() === 'zmeurica') {
-                        triggerFinalVictory();
-                    } else {
-                        print("❌ Parolă de sistem incorectă! Mai încearcă sau tastează 'hint'.", "error-msg");
-                    }
-                }
-                break;
-
-            case 'clear':
-                terminal.innerHTML = '';
-                break;
-
-            default:
-                print(`❌ Comandă necunoscută: '${mainCmd}'. Tastează 'help' pentru ajutor tactic.`, "error-msg");
-        }
-    }
-
-    function triggerFinalVictory() {
-        terminal.innerHTML = '';
-        print(`<span class="ascii" style="color: #c8372d; font-weight: bold;">
-   🧟‍♂️🧱 🌟 BAZA LEGO SALVATĂ CU SUCCES! 🌟 🧱🧟‍♂️
-        </span>`, 'success-msg');
-        
-        print("------------------------------------------------------------------");
-        print("❤️ <b>Felicitări, supraviețuitorule! Ai trecut de apocalipsă și ai deblocat sistemul!</b>");
-        print("⚡ Baza a fost securizată, iar toate fișierele secrete au fost descărcate.");
-        print("<br>🎁 <b>PROTOCOALELE FINALE PENTRU PREMIU:</b><br>Cadoul fizic este la iubita ta! Ca să poți să-l ridici și să vezi ce e în cutie, trebuie să urmezi protocolul secret de predare:");
-        print("1. Du-te la ea și activează codul vostru 'I love you': apasă de 3 ori (în orice loc acceptat de voi) 👆✨");
-        print("2. Primești un pupic cald de la ea 😘");
-        print("------------------------------------------------------------------\n");
-        input.style.display = 'none';
-        document.querySelector('.prompt').style.display = 'none';
-    }
+    // Inițializare
+    renderScreen();
 </script>
 
 </body>
