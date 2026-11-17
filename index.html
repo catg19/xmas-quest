@@ -32,14 +32,14 @@
         }
 
         h1 { color: #f43f5e; margin-top: 0; font-size: 22px; }
-        .hud { font-size: 14px; color: #38bdf8; margin-bottom: 15px; font-weight: bold; }
+        .hud { font-size: 14px; color: #38bdf8; margin-bottom: 12px; font-weight: bold; }
 
         .game-screen {
             background: #090d16;
             border: 2px dashed #475569;
             border-radius: 10px;
             padding: 15px;
-            min-height: 320px;
+            min-height: 330px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -61,29 +61,67 @@
         }
         .btn:hover { background-color: #059669; color: white; }
 
-        .lego-pool { display: flex; gap: 8px; margin-bottom: 12px; }
-        .lego-block {
-            width: 60px; height: 30px; border-radius: 4px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 11px; color: white; border: 2px solid rgba(255,255,255,0.4);
-            box-shadow: 0 3px 5px rgba(0,0,0,0.3);
-            transition: transform 0.1s;
+        /* Bancul de piese LEGO (Sursa) */
+        .lego-palette {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            justify-content: center;
         }
-        .lego-block:hover { transform: scale(1.05); }
 
-        .wall-slot-container {
-            width: 150px; height: 190px; border: 2px dashed #334155; border-radius: 6px;
-            display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start;
-            padding: 5px; background: #0f172a; gap: 3px; overflow-y: auto;
+        /* Designul unei piese LEGO adevărate (cu butoane/studs) */
+        .lego-brick {
+            width: 75px;
+            height: 35px;
+            border-radius: 4px;
+            cursor: grab;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 2px 3px rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 3px;
         }
+        .lego-brick:active { cursor: grabbing; }
+
+        /* Butoanele de pe piesa LEGO (studs) */
+        .stud {
+            width: 10px;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .brick-red { background-color: #dc2626; border-bottom: 3px solid #991b1b; }
+        .brick-green { background-color: #16a34a; border-bottom: 3px solid #166534; }
+        .brick-blue { background-color: #2563eb; border-bottom: 3px solid #1e40af; }
+
+        /* Zona unde se construiește zidul (Drop Zone) */
+        .wall-dropzone {
+            width: 160px;
+            height: 180px;
+            border: 3px dashed #38bdf8;
+            border-radius: 8px;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 5px;
+            gap: 3px;
+            overflow-y: auto;
+        }
+        .wall-dropzone.drag-over {
+            background: #1e293b;
+            border-color: #34d399;
+        }
+
         .placed-brick {
-            width: 130px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 11px; border: 2px solid rgba(255,255,255,0.3);
+            width: 130px;
+            height: 25px;
+            border-radius: 4px;
+            box-shadow: inset 0 2px 2px rgba(255,255,255,0.3);
         }
-
-        .bg-red { background: #dc2626; }
-        .bg-green { background: #16a34a; }
-        .bg-blue { background: #2563eb; }
 
         canvas { background: #111827; border: 2px solid #374151; border-radius: 6px; display: block; margin: 0 auto; }
         .puzzle-grid { display: grid; grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(3, 80px); gap: 3px; background: #334155; padding: 3px; border-radius: 6px; }
@@ -108,42 +146,76 @@
     const hud = document.getElementById("hudTitle");
     let currentLevel = 1;
 
-    let stackedCount = 0;
+    // ==========================================
+    // NIVELUL 1: Drag and Drop piese LEGO
+    // ==========================================
+    let placedBricksCount = 0;
     function loadLevel1() {
-        stackedCount = 0;
-        hud.innerText = "Nivelul 1: Stivuirea Zidului LEGO (9 piese) 🧱";
+        placedBricksCount = 0;
+        hud.innerText = "Nivelul 1: Drag & Drop Piese LEGO (9 necesare) 🧱";
         screen.innerHTML = `
-            <p style="font-size:12px; margin:0 0 8px 0;">Construiește un zid masiv stivuind <b>9 piese de LEGO</b> (oricare dintre ele, până se umple zidul):</p>
-            <div class="lego-pool">
-                <div class="lego-block bg-red" onclick="stackBrick('red', 'Roșu')">Roșu</div>
-                <div class="lego-block bg-green" onclick="stackBrick('green', 'Verde')">Verde</div>
-                <div class="lego-block bg-blue" onclick="stackBrick('blue', 'Albastru')">Albastru</div>
+            <p style="font-size:12px; margin:0 0 10px 0;">Trage piese LEGO din paletă și pune-le în zona de construcție până faci un zid de <b>9 piese</b>:</p>
+            
+            <div class="lego-palette">
+                <div class="lego-brick brick-red" draggable="true" ondragstart="drag(event, 'red')"><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+                <div class="lego-brick brick-green" draggable="true" ondragstart="drag(event, 'green')"><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+                <div class="lego-brick brick-blue" draggable="true" ondragstart="drag(event, 'blue')"><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
             </div>
-            <div class="wall-slot-container" id="wallSlot" title="Zidul în construcție"></div>
-            <div class="msg" id="msg1">Piese stivuite: 0 / 9</div>
+
+            <div class="wall-dropzone" id="wallDrop" ondragover="allowDrop(event)" ondragleave="removeHighlight(event)" ondrop="dropBrick(event)" title="Trage piesele aici">
+                <span style="color: #64748b; font-size: 11px; margin: auto;">Zona de zid</span>
+            </div>
+
+            <div class="msg" id="msg1">Piese plasate: 0 / 9</div>
             <button class="btn" style="display:none;" id="nextBtn1" onclick="currentLevel=2; loadLevel2();">Treci la Nivelul 2</button>
         `;
     }
 
-    function stackBrick(colorCode, colorName) {
-        if (stackedCount >= 9) return;
+    function allowDrop(ev) {
+        ev.preventDefault();
+        document.getElementById("wallDrop").classList.add("drag-over");
+    }
 
-        stackedCount++;
-        const wallSlot = document.getElementById("wallSlot");
-        const brick = document.createElement("div");
-        brick.className = `placed-brick bg-${colorCode}`;
-        brick.innerText = colorName + " #" + stackedCount;
-        wallSlot.appendChild(brick);
+    function removeHighlight(ev) {
+        document.getElementById("wallDrop").classList.remove("drag-over");
+    }
+
+    function drag(ev, color) {
+        ev.dataTransfer.setData("text", color);
+    }
+
+    function dropBrick(ev) {
+        ev.preventDefault();
+        document.getElementById("wallDrop").classList.remove("drag-over");
+        if (placedBricksCount >= 9) return;
+
+        const color = ev.dataTransfer.getData("text");
+        if (!color) return;
+
+        placedBricksCount++;
+        const dropZone = document.getElementById("wallDrop");
+        
+        // Scoate textul de ghidaj la prima piesă
+        if (dropZone.querySelector("span")) {
+            dropZone.querySelector("span").remove();
+        }
+
+        const newBrick = document.createElement("div");
+        newBrick.className = `placed-brick brick-${color}`;
+        dropZone.appendChild(newBrick);
 
         const msg = document.getElementById("msg1");
-        if (stackedCount === 9) {
-            msg.innerHTML = `<span class="success">🎉 Zid masiv construit cu succes! Hoarda a fost oprită!</span>`;
+        if (placedBricksCount === 9) {
+            msg.innerHTML = `<span class="success">🎉 Zid masiv construit complet prin Drag & Drop! Hoarda oprită!</span>`;
             document.getElementById("nextBtn1").style.display = "inline-block";
         } else {
-            msg.innerHTML = `<span class="success">✔️ Piesa adăugată în stivă! Total: ${stackedCount} / 9</span>`;
+            msg.innerHTML = `<span class="success">✔️ Piese plasate: ${placedBricksCount} / 9</span>`;
         }
     }
 
+    // ==========================================
+    // NIVELUL 2: Ferește-te de Zombie (Mătură & Coasă)
+    // ==========================================
     let animId;
     function loadLevel2() {
         hud.innerText = "Nivelul 2: Ferește-te de Zombieland (Kiseleff Style) 🏃‍♂️";
@@ -206,6 +278,9 @@
         loop();
     }
 
+    // ==========================================
+    // NIVELUL 3: Puzzle Foto cu Voi Doi
+    // ==========================================
     function loadLevel3() {
         hud.innerText = "Nivelul 3: Reconstruiește Amintirea (Puzzle Foto) 🧩";
         screen.innerHTML = `
@@ -258,6 +333,9 @@
         setTimeout(() => { loadVictoryScreen(); }, 1200);
     }
 
+    // ==========================================
+    // FINALUL: Victorie & Cadou
+    // ==========================================
     function loadVictoryScreen() {
         hud.innerText = "MISIUNE ÎNDEPLINITĂ 🏆";
         screen.innerHTML = `
