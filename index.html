@@ -3,57 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xmas Terminal Protocol - Secure Release</title>
+    <title>Xmas Secret Protocol 🎄</title>
     <style>
         body {
-            background-color: #0d1117;
-            color: #39d353;
+            background-color: #fcfbf7; /* Crem cald / alb curat */
+            color: #1f3a29; /* Verde închis elegant */
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             height: 90vh;
+            position: relative;
+            overflow: hidden;
         }
+
+        /* Fulgi de zăpadă decorativi pe fundal */
+        .snowflakes {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+            background-image: radial-gradient(#d4af37 1.5px, transparent 1.5px), radial-gradient(#2d5a3f 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+        }
+
+        .header-banner {
+            z-index: 1;
+            text-align: center;
+            border-bottom: 2px dashed #c8372d; /* Roșu Crăciun */
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .header-banner h1 {
+            margin: 0;
+            font-size: 22px;
+            color: #c8372d;
+        }
+
+        .header-banner p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #2d5a3f;
+        }
+
         #terminal {
             flex-grow: 1;
             overflow-y: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
-            padding-bottom: 10px;
+            padding: 10px;
+            z-index: 1;
+            background: #ffffff;
+            border: 2px solid #e0dfd5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
+
         .input-line {
             display: flex;
             align-items: center;
-            border-top: 1px solid #30363d;
-            padding-top: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background: #ffffff;
+            border: 2px solid #2d5a3f;
+            border-radius: 8px;
+            z-index: 1;
         }
+
         .prompt {
-            color: #ff7b72;
+            color: #c8372d;
             margin-right: 8px;
             font-weight: bold;
         }
+
         input {
             background: transparent;
             border: none;
-            color: #c9d1d9;
+            color: #1f3a29;
             font-family: 'Courier New', Courier, monospace;
             font-size: 16px;
             flex-grow: 1;
             outline: none;
         }
-        .system-msg { color: #58a6ff; }
-        .error-msg { color: #ff7b72; }
-        .success-msg { color: #39d353; font-weight: bold; }
-        .ascii { color: #f0883e; }
+
+        .system-msg { color: #2d5a3f; margin: 6px 0; }
+        .error-msg { color: #c8372d; font-weight: bold; margin: 6px 0; }
+        .success-msg { color: #2d5a3f; font-weight: bold; margin: 6px 0; }
+        .ascii { color: #d4af37; font-size: 13px; line-height: 1.1; }
     </style>
 </head>
 <body>
 
+    <div class="snowflakes"></div>
+
+    <div class="header-banner">
+        <h1>🎅 🎄 Secure Xmas Protocol 🦌 ✨</h1>
+        <p>Sistem de deblocare cadou secret – Ediția de iarnă</p>
+    </div>
+
     <div id="terminal"></div>
     
     <div class="input-line">
-        <span class="prompt">guest@xmas-core:~$</span>
+        <span class="prompt">code_hunter@xmas-pc:~$</span>
         <input type="text" id="commandInput" autofocus autocomplete="off" spellcheck="false">
     </div>
 
@@ -72,26 +127,29 @@
     }
 
     print(`<span class="ascii">
-  _  __          _                    ____             _         
- | |/ /___ _   _| |   ___  ___ _ __  |  _ \\ _ __ ___  (_)_ __    
- | ' // _ \\ | | | |   / _ \\/ __| '__| | |_) | '__/ _ \\ | | '_ \\   
- | . \\  __/ |_| | |__|  __/ (__| |    |  __/| | |  __/_| | | | |  
- |_|\\_\\___|\\__,_|_____\\___|\\___|_|    |_|   |_|  \\___(_)_|_| |_|  
-    </span>`, 'ascii');
-    print("🎄 [SYSTEM ALERT] Conexiune securizată stabilită cu Serverul Secret de Crăciun.");
-    print("ℹ️ Bun venit, programatorule! Ca să deblochezi pachetul cadou (<b>Raspberry_Pi_5.img</b>), trebuie să treci de protocolul de securitate.");
-    print("💡 Tastază <b>help</b> pentru a vedea comenzile disponibile.\n");
+     _.-'"` + "`" + `'-._
+   .'   _     _   '.
+  /    (o)   (o)    \\     🌟 [SYSTEM INITIALIZED] 🌟
+ |                  |    Conexiune stabilită cu serverul secret al Moșului.
+ |  \\            /  |    Bine ai venit, programatorule!
+  \\  '.        .'  / 
+   '._  '----'  _.'
+      '--....--'
+    </span>`);
+    
+    print("🎄 <b>Misiune activă:</b> Pentru a debloca surpriza pregătită de iubita ta, trebuie să treci de protocolul de securitate.");
+    print("ℹ️ Tastază <b>help</b> pentru a vedea comenzile pe care le poți folosi.\n");
 
     const fileSystem = {
-        "readme.txt": "Misiune: Găsește parola secretă a bazei de date. Indiciu nivel 1: Întreabă-o pe iubita ta cum alintă cel mai des sistemul.",
-        "secret_log.git": "commit 404a8b2: [Xmas Update] Fixed bug where boyfriend was too genius. Added hidden gift under the couch.",
-        "config.json": '{\n  "target": "Raspberry Pi 5",\n  "status": "LOCKED",\n  "encryption": "SHA-256-LOVE"\n}'
+        "readme.txt": "Misiune Nivel 1: Găsește parola secretă. Indiciu: Întreabă-o pe iubita ta cum alintă cel mai des sistemul sau gândește-te la seara aia pe Kiseleff când ne-am contrazis: domnul de pe stradă avea în mână o mătură lungă (cum ziceai tu) sau o coasă (cum ziceam eu)? (Poți scrie și 'hint').",
+        "secret_log.git": "commit 8f2a1c: [Xmas Memory] Kiseleff walk - debate still open between broom vs scythe. The correct security keyword is how she nicknamed the system.",
+        "config.json": '{\n  "status": "SECURED",\n  "encryption": "TRUE-LOVE-2026"\n}'
     };
 
     input.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
             const cmd = input.value.trim();
-            print(`<span class="prompt">guest@xmas-core:~$</span> ${cmd}`);
+            print(`<span class="prompt">code_hunter@xmas-pc:~$</span> ${cmd}`);
             handleCommand(cmd);
             input.value = '';
         }
@@ -104,18 +162,17 @@
 
         switch(mainCmd) {
             case 'help':
-                print("📋 Comenzi disponibile:");
-                print("  <b>ls</b>            - Listează fișierele din directorul curent");
-                print("  <b>cat [fișier]</b>  - Citește conținutul unui fișier");
+                print("📋 <b>Comenzi disponibile:</b>");
+                print("  <b>ls</b>            - Listează fișierele secrete din director");
+                print("  <b>cat [fișier]</b>  - Citește conținutul unui fișier (ex: cat readme.txt)");
                 print("  <b>git status</b>    - Verifică starea repository-ului de Crăciun");
-                print("  <b>git log</b>     - Vezi istoricul commit-urilor (s-ar putea să găsești Easter Eggs)");
-                print("  <b>decrypt [cod]</b> - Încearcă să spargi parola nivelului curent");
-                print("  <b>hint</b>          - Afișează un indiciu prietenos");
+                print("  <b>decrypt [cod]</b> - Încearcă să spargi parola cu un cuvânt cheie");
+                print("  <b>hint</b>          - Afișează un indiciu suplimentar");
                 print("  <b>clear</b>         - Curăță ecranul terminalului");
                 break;
 
             case 'ls':
-                print("📂 Fișiere disponibile în director:");
+                print("📂 <b>Fișiere disponibile în director:</b>");
                 for (let file in fileSystem) {
                     print(`  - ${file}`);
                 }
@@ -123,51 +180,45 @@
 
             case 'cat':
                 if (!arg) {
-                    print("Eroare: Specifică un fișier (ex: cat readme.txt)", "error-msg");
+                    print("❌ Eroare: Specifică un fișier (ex: cat readme.txt)", "error-msg");
                 } else if (fileSystem[arg]) {
                     print(fileSystem[arg].replace(/\n/g, '<br>'), "system-msg");
                 } else {
-                    print(`Eroare: Fișierul '${arg}'-nu există sau a fost șters de un Elf obraznic.`, "error-msg");
+                    print(`❌ Eroare: Fișierul '${arg}' nu există.`, "error-msg");
                 }
                 break;
 
             case 'git':
                 if (arg === 'status') {
-                    print("On branch main\nYour branch is up to date with 'origin/xmas-2026'.\nChanges not staged for commit:\n  (use 'git add <file>' to update what will be committed)\n	<span class='error-msg'>modified:   heart_status (overloaded with love)</span>");
-                } else if (arg === 'log') {
-                    print("commit 9f8e7d6 (HEAD -> main)\nAuthor: Iubita ta <december@xmas.local>\nDate:   Fri Dec 24 2026\n\n    feat: added the best tech gift ever for the smartest developer.");
+                    print("On branch main\nYour branch is up to date with 'origin/xmas'.\nChanges not staged for commit:\n  <span class='error-msg'>modified:   heart_rate (spiked because of you)</span>");
                 } else {
-                    print("Comandă git necunoscută. Încearcă 'git status' sau 'git log'.");
+                    print("Comandă git necunoscută. Încearcă 'git status'.");
                 }
                 break;
 
             case 'hint':
-                if (currentLevel === 1) {
-                    print("💡 Indiciu Nivel 1: Deschide fișierul secret_log.git sau gândește-te la o parolă legată de voi doi (aniversarea voastră sau o poreclă). Sau tastează direct 'decrypt iubire'.");
-                } else if (currentLevel === 2) {
-                    print("💡 Indiciu Nivel 2: Caută prin codul sursă al paginii sau rulează comanda care îți cere un cod de deblocare.");
-                }
+                print("💡 <b>Indiciu:</b> Gândește-te la cum alintă ea sistemul / cum i se spune drăgălaș unui animal mic și pufos. Cuvântul are 8 litere și începe cu litera 'z'.");
                 break;
 
             case 'decrypt':
                 if (currentLevel === 1) {
-                    if (arg && (arg.toLowerCase() === 'iubire' || arg.toLowerCase() === 'craciun' || arg.toLowerCase() === 'raspberry')) {
+                    if (arg && arg.toLowerCase() === 'zmeurica') {
                         currentLevel = 2;
-                        print("🎉 Nivelul 1 trecut! Firewall-ul de Crăciun a cedat parțial.", "success-msg");
-                        print("🔐 Nivelul 2: S-a deschis protocolul root. Pentru a extrage <b>Raspberry_Pi_5.img</b>, introdu comanda finală: <b>sudo unwrap-gift</b>");
+                        print("🎉 <b>Parolă corectă!</b> Sistemul a validat cu succes cheia 'zmeurica'.", "success-msg");
+                        print("🔐 <b>Ultimul pas:</b> Pentru a descărca pachetul final și a trimite semnalul către cadoul tău, introdu comanda: <b>sudo claim-gift</b>");
                     } else {
-                        print("❌ Parolă incorectă! Elfii spun că nu e asta. Mai încearcă sau scrie 'hint'.", "error-msg");
+                        print("❌ Parolă incorectă! Nu este cuvântul căutat. Mai încearcă sau tastează 'hint'.", "error-msg");
                     }
                 } else {
-                    print("Eroare: Nivelul 1 a fost deja depășit. Folosește comanda specifică nivelului 2.", "error-msg");
+                    print("Eroare: Ai trecut deja de această etapă. Folosește comanda cerută pentru pasul final.", "error-msg");
                 }
                 break;
 
             case 'sudo':
-                if (arg === 'unwrap-gift' && currentLevel >= 2) {
+                if (arg === 'claim-gift' && currentLevel >= 2) {
                     triggerFinalVictory();
                 } else {
-                    print("❌ Acces respres. Utilizatorul nu are permisiuni de Moș Crăciun.", "error-msg");
+                    print("❌ Acces respins. Comandă invalidă pentru nivelul actual.", "error-msg");
                 }
                 break;
 
@@ -176,26 +227,22 @@
                 break;
 
             default:
-                print(`Comandă necunoscută: '${mainCmd}'. Tastează 'help' pentru ajutor.`, "error-msg");
+                print(`❌ Comandă necunoscută: '${mainCmd}'. Tastează 'help' pentru ghid.`, "error-msg");
         }
     }
 
     function triggerFinalVictory() {
         terminal.innerHTML = '';
-        print(`<span class="ascii">
-   _____                _      _               _    ____  _   _ ___ 
-  |_   _|__  _ __ _ __ | |__  (_)_ __   __ _  | |  |  _ \\| | | |_ _|
-    | |/ _ \\| '__| '_ \\| '_ \\ | | '_ \\ / _\` | | |  | |_) | | | || | 
-    | | (_) | |  | |_) | | | || | | | | (_| | | |__|  __/| |_| || | 
-    |_|\\___/|_|  | .__/|_| |_||_|_| |_|\\__, | |_____|_|    \\___/|___|
-                 |_|                   |___/                         
+        print(`<span class="ascii" style="color: #c8372d; font-weight: bold;">
+   🎁 ✨ DECRYPTION COMPLETE! ✨ 🎁
         </span>`, 'success-msg');
         
-        print("🎁 <b>DECRYPTION SUCCESSFUL! PACHETUL A FOST INSTALAT CU SUCCES!</b> 🎁", "success-msg");
         print("------------------------------------------------------------------");
-        print("❤️ Felicitări, programatorul meu favorit! Ai spart sistemul de Crăciun.");
-        print("⚡ Premiul tău pentru cel mai clever iubit este: <b>Un nou Raspberry Pi 5</b> gata de experimente!");
-        print("🏠 <b>Indiciu fizic:</b> Mergi la [scrie aici unde ai ascuns cadoul prin casă] ca să-ți ridici hardware-ul real! 🚀");
+        print("❤️ <b>Felicitări, programatorul meu favorit! Ai spart toate codurile!</b>");
+        print("⚡ Toate fișierele au fost descărcate cu succes în inima mea.");
+        print("<br>🎁 <b>PREMIUL TĂU FIZIC:</b><br>Cadoul este chiar la mine! Ca să poți să-l ridici și să vezi ce e în cutie, trebuie să urmezi protocolul obligatoriu de predare:");
+        print("1. Primești un pupic cald de la iubita ta 😘");
+        print("2. Trebuie să o strângi în brațe de 3 ori (squeeze me 3 times) 🤗");
         print("------------------------------------------------------------------\n");
         input.style.display = 'none';
         document.querySelector('.prompt').style.display = 'none';
