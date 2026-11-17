@@ -3,228 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEGO Zombie Xmas Defense 🎄🧱</title>
+    <title>LEGO Zombie Defense - Interactive Game 🎄</title>
     <style>
         body {
-            background-color: #fcfbf7;
-            color: #1f3a29;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 90vh;
+            min-height: 95vh;
         }
 
-        .container {
+        .game-container {
             width: 100%;
-            max-width: 650px;
-            background: #ffffff;
-            border: 3px solid #2d5a3f;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            padding: 25px;
+            max-width: 700px;
+            background: #1e293b;
+            border: 4px solid #38bdf8;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 30px;
             box-sizing: border-box;
-            margin-top: 10px;
         }
 
         h1 {
-            color: #c8372d;
+            color: #f43f5e;
             text-align: center;
-            font-size: 24px;
             margin-top: 0;
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .subtitle {
-            text-align: center;
-            font-size: 13px;
-            color: #2d5a3f;
-            margin-bottom: 20px;
-            border-bottom: 2px dashed #e0dfd5;
-            padding-bottom: 10px;
-        }
-
-        .game-screen {
-            background: #f4f3ea;
-            border: 2px solid #d0cfc3;
-            border-radius: 8px;
-            padding: 20px;
-            min-height: 180px;
-            margin-bottom: 20px;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-        .action-box {
+        .hud {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-            flex-grow: 1;
-            padding: 12px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            border: 2px solid #2d5a3f;
-            border-radius: 6px;
-            outline: none;
-            background: #fff;
-            color: #1f3a29;
-        }
-
-        button {
-            background-color: #c8372d;
-            color: white;
-            border: none;
+            justify-content: space-between;
+            background: #0f172a;
             padding: 12px 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
+            border-radius: 8px;
+            margin-bottom: 25px;
             font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
+            font-size: 15px;
+            border: 2px solid #334155;
         }
 
-        button:hover {
-            background-color: #a02b22;
-        }
-
-        .btn-group {
+        .screen-box {
+            background: #090d16;
+            border: 2px dashed #475569;
+            border-radius: 12px;
+            padding: 25px;
+            min-height: 220px;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Stilul pieselor LEGO interactive */
+        .lego-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
             justify-content: center;
             margin-top: 15px;
         }
 
-        .btn-choice {
-            background-color: #2d5a3f;
-        }
-        .btn-choice:hover {
-            background-color: #1f3a29;
+        .lego-brick {
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 3px solid rgba(255,255,255,0.2);
+            transition: transform 0.1s, filter 0.2s;
+            font-size: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        .error { color: #c8372d; font-weight: bold; margin-top: 10px; }
-        .success { color: #2d5a3f; font-weight: bold; margin-top: 10px; }
-        
-        .hidden { display: none; }
+        .lego-brick:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+
+        .brick-red { background-color: #dc2626; color: white; }
+        .brick-green { background-color: #16a34a; color: white; }
+        .brick-blue { background-color: #2563eb; color: white; }
+        .brick-yellow { background-color: #ca8a04; color: white; }
+
+        .btn-action {
+            background-color: #10b981;
+            color: #0f172a;
+            border: none;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: #059669;
+            color: white;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .error { color: #f43f5e; }
+        .success { color: #34d399; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🧟‍♂️ 🧱 LEGO Zombie Xmas Defense 🎅</h1>
-        <div class="subtitle">Sistem de supraviețuire tactică & misiune secretă de iarnă</div>
-
-        <div class="game-screen" id="gameScreen">
-            <!-- Dinamic prin JS -->
-        </div>
-
-        <div id="inputSection" class="action-box">
-            <input type="text" id="userInput" placeholder="Introdu comanda sau răspunsul..." autofocus autocomplete="off">
-            <button id="submitBtn" onclick="handleAction()">Trimite</button>
-        </div>
+    <div class="game-container">
+        <h1>🧟‍♂️ LEGO Zombie Defense 🎄</h1>
         
-        <div id="choiceSection" class="hidden btn-group">
-            <!-- Butoane opționale pentru alegeri -->
+        <div class="hud">
+            <span id="levelIndicator">Nivel: 1 / 3</span>
+            <span id="statusIndicator">Status: Hoardă în apropiere ⚠️</span>
+        </div>
+
+        <div class="screen-box" id="gameArea">
+            <!-- Dinamic -->
         </div>
     </div>
 
 <script>
-    const screen = document.getElementById("gameScreen");
-    const input = document.getElementById("userInput");
-    const inputSection = document.getElementById("inputSection");
-    const choiceSection = document.getElementById("choiceSection");
+    const gameArea = document.getElementById("gameArea");
+    const levelIndicator = document.getElementById("levelIndicator");
+    const statusIndicator = document.getElementById("statusIndicator");
 
-    let level = 1;
+    let currentStage = 1;
 
-    function renderScreen() {
-        if (level === 1) {
-            screen.innerHTML = `
-                <b>Nivel 1: Apărarea Perimetrului (Zombii & LEGO)</b><br><br>
-                🎄 O hoardă de zombii se apropie amenințător de baza ta de Crăciun! Baza este construită din piese LEGO, dar perimetrul este descoperit.<br><br>
-                💡 <b>Misiune:</b> Trebuie să asamblezi rapid un zid de apărare din cărămizi LEGO.<br>
-                👉 <i>Indiciu: Scrie comanda</i> <code>build lego-wall</code> <i>ca să ridici zidul!</i>
-            `;
-        } else if (level === 2) {
-            screen.innerHTML = `
-                <b>Nivel 2: Amintirea de pe Kiseleff</b><br><br>
-                🧱 Zidul LEGO a oprit hoarda principală, dar un zombi masiv încearcă să spargă poarta principală!<br><br>
-                🕵️‍♂️ Sistemul de securitate îți cere o parolă bazată pe o amintire: În seara aia de pe Kiseleff când v-ați contrazis... ce zicea el că are domnul de pe stradă în mână?<br><br>
-                👇 Alege varianta corectă sau tastează răspunsul:
-            `;
-            inputSection.style.display = "none";
-            choiceSection.style.display = "flex";
-            choiceSection.innerHTML = `
-                <button class="btn-choice" onclick="checkChoice('coasa')">Coasa (El)</button>
-                <button class="btn-choice" onclick="checkChoice('matura')">Mătură lungă (Tu)</button>
-            `;
-        } else if (level === 3) {
-            choiceSection.style.display = "none";
-            inputSection.style.display = "flex";
-            screen.innerHTML = `
-                <b>Nivel 3: Codul Suprem de Suprascriere</b><br><br>
-                🎉 Ai trecut de poartă! Ești la ultimul pas.<br><br>
-                ⚡ Unitatea centrală a bazei necesită codul secret al proiectului (denumirea secretă pe care ai pus-o cadoului hardware care te așteaptă).<br><br>
-                💡 <i>Indiciu: Cum se numește proiectul secret? (Începe cu litera 'z'...)</i>
-            `;
-            input.value = "";
-            input.placeholder = "Introdu codul secret...";
-        } else if (level === 4) {
-            inputSection.style.display = "none";
-            choiceSection.style.display = "none";
-            screen.innerHTML = `
-                <div style="text-align: center; color: #c8372d;">
-                    <h2>🎁 🌟 BAZA LEGO SALVATĂ CU SUCCES! 🌟 🎁</h2>
+    function renderStage() {
+        if (currentStage === 1) {
+            levelIndicator.innerText = "Nivel: 1 / 3";
+            statusIndicator.innerText = "Construiește Zidul LEGO 🧱";
+            gameArea.innerHTML = `
+                <p>O hoardă de zombii atacă baza de Crăciun! Ca să construiești perimetrul de apărare din cărămizi LEGO, trebuie să pui piesele în ordinea corectă a culorilor:</p>
+                <p style="color: #38bdf8; font-weight: bold;">Ordine necesară: Roșu ➔ Verde ➔ Albastru</p>
+                <div class="lego-grid" id="legoBuilder">
+                    <div class="lego-brick brick-blue" onclick="selectBrick('blue')">Piesa Albastră</div>
+                    <div class="lego-brick brick-red" onclick="selectBrick('red')">Piesa Roșie</div>
+                    <div class="lego-brick brick-green" onclick="selectBrick('green')">Piesa Verde</div>
                 </div>
-                ❤️ <b>Felicitări, supraviețuitorule! Ai spart toate codurile și ai trecut de apocalipsă!</b><br><br>
-                ⚡ Toate sistemele sunt securizate. Premiul tău hardware (Raspberry Pi 5) este ținut sub strictă pază de iubita ta!<br><br>
-                <b>Protocolul final de revendicare a cadoului:</b><br>
-                1. Du-te la ea și activează codul vostru secret de „I love you”: <b>apasă de 3 ori în orice loc</b> 👆✨<br>
-                2. Primești un pupic cald de la ea ca recompensă finală! 😘
+                <div id="msg" class="message"></div>
+            `;
+            window.selectedSequence = [];
+        } 
+        else if (currentStage === 2) {
+            levelIndicator.innerText = "Nivel: 2 / 3";
+            statusIndicator.innerText = "Poarta Principală 🚪";
+            gameArea.innerHTML = `
+                <p>Zidul LEGO rezistă, dar un zombi masiv vrea să spargă poarta. Sistemul îți cere să alegi amintirea corectă de la plimbarea de pe Kiseleff!</p>
+                <p>Ce avea domnul de pe stradă în mână?</p>
+                <div class="lego-grid">
+                    <button class="lego-brick brick-red" onclick="checkKiseleff('matura')">O mătură lungă (Tu)</button>
+                    <button class="lego-brick brick-green" onclick="checkKiseleff('coasa')">O coasă (El)</button>
+                </div>
+                <div id="msg" class="message"></div>
+            `;
+        } 
+        else if (currentStage === 3) {
+            levelIndicator.innerText = "Nivel: 3 / 3";
+            statusIndicator.innerText = "Securitate Finală ⚡";
+            gameArea.innerHTML = `
+                <p>Poarta a rezistat! Acum trebuie să deblochezi sistemul central introducând codul secret al proiectului (denumirea secretă a cadoului tău hardware care începe cu 'z').</p>
+                <input type="text" id="finalCodeInput" placeholder="Introdu codul secret..." style="padding: 10px; font-size: 16px; border-radius: 6px; border: 2px solid #38bdf8; width: 250px; text-align: center; margin-top: 10px; background: #0f172a; color: white;">
+                <button class="btn-action" onclick="checkFinalCode()">Dezarmează Sistemul</button>
+                <div id="msg" class="message"></div>
+            `;
+        } 
+        else if (currentStage === 4) {
+            levelIndicator.innerText = "MISIUNE ÎNDEPLINITĂ 🎉";
+            statusIndicator.innerText = "Bază Salvată 🏆";
+            gameArea.innerHTML = `
+                <h2 style="color: #34d399; margin-top:0;">🌟 AI SALVAT BAZA DE CRĂCIUN! 🌟</h2>
+                <p style="font-size: 16px; line-height: 1.6;">
+                    Toate sistemele sunt securizate! Premiul tău fizic (Raspberry Pi 5) este pregătit și se află la iubita ta.<br><br>
+                    <b>Protocolul final de revendicare:</b><br>
+                    1. Du-te la ea și execută codul vostru secret de „I love you”: <b>apasă de 3 ori în orice loc</b> 👆✨<br>
+                    2. Primești un pupic cald de la ea ca recompensă absolută! 😘
+                </p>
             `;
         }
     }
 
-    function handleAction() {
-        const val = input.value.trim().toLowerCase();
-        
-        if (level === 1) {
-            if (val === "build lego-wall") {
-                level = 2;
-                renderScreen();
+    // Logica pentru Nivelul 1 (Ordonarea pieselor LEGO)
+    window.selectedSequence = [];
+    function selectBrick(color) {
+        const msg = document.getElementById("msg");
+        window.selectedSequence.push(color);
+
+        if (window.selectedSequence.length === 1) {
+            if (color !== 'red') {
+                msg.innerHTML = `<span class="error">❌ Greșit! Prima piesă a zidului trebuie să fie cea Roșie. Încearcă din nou!</span>`;
+                window.selectedSequence = [];
             } else {
-                screen.innerHTML += `<div class="error">❌ Comandă greșită! Încearcă: <code>build lego-wall</code></div>`;
+                msg.innerHTML = `<span class="success">✔️ Piesa roșie pusă corect! Urmează piesa verde.</span>`;
             }
-        } else if (level === 3) {
-            if (val === "zmeurica") {
-                level = 4;
-                renderScreen();
+        } else if (window.selectedSequence.length === 2) {
+            if (color !== 'green') {
+                msg.innerHTML = `<span class="error">❌ Greșit! A doua piesa trebuie să fie cea Verde. Resetat!</span>`;
+                window.selectedSequence = [];
             } else {
-                screen.innerHTML += `<div class="error">❌ Cod incorect! Gândește-te la numele de cod al proiectului.</div>`;
+                msg.innerHTML = `<span class="success">✔️ Piesa verde pusă corect! Mai ai piesa albastră.</span>`;
+            }
+        } else if (window.selectedSequence.length === 3) {
+            if (color !== 'blue') {
+                msg.innerHTML = `<span class="error">❌ Greșit la piesa albastră! Resetat!</span>`;
+                window.selectedSequence = [];
+            } else {
+                msg.innerHTML = `<span class="success">🎉 Zidul LEGO a fost construit cu succes! Trecem la Nivelul 2...</span>`;
+                setTimeout(() => {
+                    currentStage = 2;
+                    renderStage();
+                }, 1200);
             }
         }
-        input.value = "";
     }
 
-    function checkChoice(choice) {
-        if (choice === "coasa") {
-            level = 3;
-            renderScreen();
+    // Logica pentru Nivelul 2 (Kiseleff)
+    function checkKiseleff(choice) {
+        const msg = document.getElementById("msg");
+        if (choice === 'coasa') {
+            msg.innerHTML = `<span class="success">✔️ Corect! Tu ai zis coasa, iar eu mătura. Trecem la Nivelul final...</span>`;
+            setTimeout(() => {
+                currentStage = 3;
+                renderStage();
+            }, 1200);
         } else {
-            screen.innerHTML += `<div class="error"><br>❌ Nu, aia era varianta ta (mătura)! El a zis coasa. Mai încearcă!</div>`;
+            msg.innerHTML = `<span class="error">❌ Aia era varianta mea (mătura)! Tu ai zis coasa. Mai încearcă!</span>`;
         }
     }
 
-    input.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            handleAction();
+    // Logica pentru Nivelul 3 (Codul final)
+    function checkFinalCode() {
+        const inputVal = document.getElementById("finalCodeInput").value.trim().toLowerCase();
+        const msg = document.getElementById("msg");
+        if (inputVal === "zmeurica") {
+            currentStage = 4;
+            renderStage();
+        } else {
+            msg.innerHTML = `<span class="error">❌ Cod incorect! Numele de cod al proiectului.</span>`;
         }
-    });
+    }
 
-    // Inițializare
-    renderScreen();
+    // Pornire joc
+    renderStage();
 </script>
 
 </body>
