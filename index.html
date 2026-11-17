@@ -39,7 +39,7 @@
             border: 2px dashed #475569;
             border-radius: 10px;
             padding: 15px;
-            min-height: 310px;
+            min-height: 320px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -61,7 +61,6 @@
         }
         .btn:hover { background-color: #059669; color: white; }
 
-        /* Stiluri Nivel 1 - Zid complet de 9 piese */
         .lego-pool { display: flex; gap: 8px; margin-bottom: 12px; }
         .lego-block {
             width: 60px; height: 30px; border-radius: 4px; cursor: pointer;
@@ -73,12 +72,12 @@
         .lego-block:hover { transform: scale(1.05); }
 
         .wall-slot-container {
-            width: 150px; height: 180px; border: 2px dashed #334155; border-radius: 6px;
+            width: 150px; height: 190px; border: 2px dashed #334155; border-radius: 6px;
             display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start;
-            padding: 5px; background: #0f172a; gap: 3px;
+            padding: 5px; background: #0f172a; gap: 3px; overflow-y: auto;
         }
         .placed-brick {
-            width: 130px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+            width: 130px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
             color: white; font-weight: bold; font-size: 11px; border: 2px solid rgba(255,255,255,0.3);
         }
 
@@ -110,125 +109,29 @@
     let currentLevel = 1;
 
     // ==========================================
-    // NIVELUL 1: Stivuirea Zidului de 9 piese LEGO
+    // NIVELUL 1: Stivuirea a 9 piese LEGO (Fără ordine strictă)
     // ==========================================
-    let stackOrder = [];
+    let stackedCount = 0;
     function loadLevel1() {
-        stackOrder = [];
+        stackedCount = 0;
         hud.innerText = "Nivelul 1: Stivuirea Zidului LEGO (9 piese) 🧱";
         screen.innerHTML = `
-            <p style="font-size:12px; margin:0 0 8px 0;">Construiește zidul complet (câte 3 pe rând): <b>3 Roșii (baza) ➔ 3 Verzi (mijloc) ➔ 3 Albastre (vârf)</b></p>
+            <p style="font-size:12px; margin:0 0 8px 0;">Construiește un zid masiv stivuind <b>9 piese de LEGO</b> (oricare dintre ele, până se umple zidul):</p>
             <div class="lego-pool">
                 <div class="lego-block bg-red" onclick="stackBrick('red', 'Roșu')">Roșu</div>
                 <div class="lego-block bg-green" onclick="stackBrick('green', 'Verde')">Verde</div>
                 <div class="lego-block bg-blue" onclick="stackBrick('blue', 'Albastru')">Albastru</div>
             </div>
             <div class="wall-slot-container" id="wallSlot" title="Zidul în construcție"></div>
-            <div class="msg" id="msg1">Piese adunate: 0 / 9</div>
+            <div class="msg" id="msg1">Piese stivuite: 0 / 9</div>
             <button class="btn" style="display:none;" id="nextBtn1" onclick="currentLevel=2; loadLevel2();">Treci la Nivelul 2</button>
         `;
     }
 
     function stackBrick(colorCode, colorName) {
-        const msg = document.getElementById("msg1");
-        if (stackOrder.length >= 9) return;
+        if (stackedCount >= 9) return;
 
-        // Verificăm ordinea corectă pe rânduri (câte 3 din fiecare)
-        let expectedColor = '';
-        if (stackOrder.length < 3) expectedColor = 'red';
-        else if (stackOrder.length < 6) expectedColor = 'green';
-        else expectedColor = 'blue';
-
-        if (colorCode !== expectedColor) {
-            let colorNameRo = expectedColor === 'red' ? 'Roșu' : (expectedColor === 'green' ? 'Verde' : 'Albastru');
-            msg.innerHTML = `<span class="error">❌ Greșit! Acum trebuie să pui piesă de culoare: ${colorNameRo}!</span>`;
-            return;
-        }
-
-        stackOrder.push(colorCode);
+        stackedCount++;
         const wallSlot = document.getElementById("wallSlot");
         const brick = document.createElement("div");
-        brick.className = `placed-brick bg-${colorCode}`;
-        brick.innerText = colorName + " (" + stackOrder.length + "/9)";
-        wallSlot.appendChild(brick);
-
-        if (stackOrder.length === 9) {
-            msg.innerHTML = `<span class="success">🎉 Zid masiv construit complet! Hoarda a fost oprită!</span>`;
-            document.getElementById("nextBtn1").style.display = "inline-block";
-        } else {
-            msg.innerHTML = `<span class="success">✔️ Piesa adăugată! Piese montate: ${stackOrder.length} / 9</span>`;
-        }
-    }
-
-    // ==========================================
-    // NIVELUL 2: Ferește-te de Zombie (Mătură & Coasă)
-    // ==========================================
-    let animId;
-    function loadLevel2() {
-        hud.innerText = "Nivelul 2: Ferește-te de Zombieland (Kiseleff Style) 🏃‍♂️";
-        screen.innerHTML = `
-            <p style="margin:0 0 5px 0; font-size:12px;">Apasă <b>SPACEBAR</b> sau <b>Click</b> pe ecran ca să sari peste zombiul cu mătura și coasa!</p>
-            <canvas id="c2" width="500" height="170"></canvas>
-            <div class="msg" id="msg2">Supraviețuiește 12 secunde!</div>
-        `;
-
-        const canvas = document.getElementById("c2");
-        const ctx = canvas.getContext("2d");
-
-        let p = { x: 40, y: 110, w: 20, h: 35, dy: 0, jump: -9, g: 0.5, grounded: true };
-        let zomb = { x: 500, y: 105, w: 25, h: 40, speed: 3.5 };
-        let survivalTime = 0;
-        let timerInterval = setInterval(() => { survivalTime++; }, 1000);
-
-        function jumpHandler(e) {
-            if (e.code === "Space" || e.type === "click") {
-                if (p.grounded) { p.dy = p.jump; p.grounded = false; }
-            }
-        }
-        document.addEventListener("keydown", jumpHandler);
-        canvas.addEventListener("click", jumpHandler);
-
-        function loop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            p.dy += p.g; p.y += p.dy;
-            if (p.y > 110) { p.y = 110; p.dy = 0; p.grounded = true; }
-
-            zomb.x -= zomb.speed;
-            if (zomb.x < -30) zomb.x = 520;
-
-            if (p.x < zomb.x + zomb.w && p.x + p.w > zomb.x && p.y < zomb.y + zomb.h && p.y + p.h > zomb.y) {
-                cancelAnimationFrame(animId);
-                clearInterval(timerInterval);
-                document.removeEventListener("keydown", jumpHandler);
-                document.getElementById("msg2").innerHTML = `<span class='error'>💀 Te-a prins! <button class='btn' onclick='loadLevel2()'>Reîncearcă</button></span>`;
-                return;
-            }
-
-            if (survivalTime >= 12) {
-                cancelAnimationFrame(animId);
-                clearInterval(timerInterval);
-                document.removeEventListener("keydown", jumpHandler);
-                screen.innerHTML = `<h3 style="color:#34d399; margin:10px 0;">🎉 Nivelul 2 trecut! Ai scăpat de zombiul cu mătura și coasa!</h3><button class='btn' onclick='currentLevel=3; loadLevel3();'>Treci la Puzzle Foto</button>`;
-                return;
-            }
-
-            ctx.fillStyle = "#334155"; ctx.fillRect(0, 145, canvas.width, 25);
-            ctx.fillStyle = "#38bdf8"; ctx.fillRect(p.x, p.y, p.w, p.h);
-            ctx.fillStyle = "#10b981"; ctx.fillRect(zomb.x, zomb.y, zomb.w, zomb.h);
-            ctx.fillStyle = "#facc15"; ctx.fillRect(zomb.x - 8, zomb.y + 10, 8, 4); // Mătura/coasa în mână
-
-            ctx.fillStyle = "#ffffff"; ctx.font = "11px Courier New";
-            ctx.fillText("Timp supraviețuire: " + survivalTime + "/12s", 15, 20);
-
-            animId = requestAnimationFrame(loop);
-        }
-        loop();
-    }
-
-    // ==========================================
-    // NIVELUL 3: Puzzle Foto cu Voi Doi
-    // ==========================================
-    function loadLevel3() {
-        hud.innerText = "Nivelul 3: Reconstruiește Amintirea (Puzzle Foto) 🧩";
-        screen.innerHTML = `
-            <p style="font-size:12px; margin:0 0 10px 0;">Mută piesele prin click în spațiul gol până se așază în ordine (1 la
+        brick.className = `placed
